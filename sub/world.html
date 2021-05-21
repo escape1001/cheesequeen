@@ -1,0 +1,690 @@
+<?php
+	include "php/00_conn.php";
+	session_cache_expire(30);
+	session_start();
+?>
+<!DOCTYPE html>
+<html lang="ko">
+ <head>
+  <title>world</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1"/>
+  <link rel="stylesheet" type="text/css" href="../css/reset.css"/>
+  <link rel="stylesheet" type="text/css" href="../css/header_noTop.css"/>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="../js/header.js"></script>
+  <style>
+	  @font-face {
+		font-family:'together';
+		src: url('../font/TT투게더.woff');
+		}
+	/*######## container #########*/
+		#header{position:fixed; z-index:1;}
+		#wrap{width:100%;}
+		#container{width:100%; height:6000px;}
+		.guide{position:fixed; left:50%; top:50%; width:1025px; height:100%; transform:translate(-50%,-50%); outline:1px solid gold; z-index:1;}
+
+	/*######## world #########*/
+		#world_wrap{width:100%;
+			background:url('../img/world/world_background.jpg') no-repeat 0 100%;
+			background-size:100%,100%;
+			position:fixed; left:0; top:161px;			
+		}		
+
+	/*######## info #########*/
+		#info{width:43%; height:100%; background-color:#fff; float:left; position:relative;}
+		#descArea{width:341px; height:320px; position:absolute; right:30px; bottom:30%;}
+		#descArea ul{width:100%; height:100%; position:relative;}
+		#descArea li{display:none; position:absolute; left:0; top:0;}
+		#descArea .title{font-size:30px; line-height:45px; color:#ccc; font-family:'together'; font-weight:400;}
+		#descArea .title i{font-size:45px; font-style:normal;}		
+		#descArea .selected{display:block;}
+		#descArea .desc{padding:40px 0 80px; font-size:12px;}
+		#descArea .flag{position:absolute; left:0; bottom:0;}
+		#descArea .flag a{display:inline-block; height:30px; padding-right:10px; outline:none;}
+		#descArea .flag a img{height:100%;}
+
+		/*li 개별*/
+		#descArea li:first-child .title{font-size:45px; line-height:60px; color:#333;}
+		#descArea li:first-child .desc{font-size:14px;}
+
+		#descArea ul:after{content:"";display:block;clear:both;}
+
+	/*######## itemArea #########*/
+		#itemArea{width:57%; height:100%; float:left; position:relative; overflow:hidden; background-color:rgba(0,0,0,0); transition:background 0.5s;}
+		#itemArea .film{width:100%; height:500%; transform:translatey(20%); transition:transform 0.5s;}
+		#itemArea .film ul{width:460px; height:20%; margin-left:15%; transition:opacity 1s ease-out 0.3s;}
+		#itemArea .film ul:nth-child(2n) li{float:right;}
+		#itemArea .film .selected{display:block;}
+		#itemArea .film li{width:200px; float:left; margin-right:30px; margin-top:10%;}
+		#itemArea .film li:nth-child(2){transform:translatey(50%);}
+		#itemArea .film li:last-child{margin-bottom:0;}
+		#itemArea .film li a{display:block; width:90%; padding:5%; background-color:#fff; border-radius:5px; box-shadow:5px 5px 10px rgba(0,0,0,0.5);}
+		#itemArea .film li a span{display:block; width:100%;}
+		#itemArea .film li a img{width:100%;}
+		#itemArea .film li a .text{text-align:center; font-size:14px;}
+		#itemArea .film li a .title{display:block; padding-top:10px;}
+		#itemArea .film li a .price{display:block; font-style:normal;}
+		#itemArea .film li a .desc{display:block; padding:10px 0; font-style:normal; color:#777; font-size:12px;}
+
+		/*li 개별 색상작업*/
+		#itemArea .italy .price{color:#009246;}
+		#itemArea .switz .price{color:#FF0000;}
+		#itemArea .neth .price{color:#21468B;}
+		#itemArea .usa .price{color:#FFCC32;}
+		#itemArea .france .price{color:#4B218B;}
+	
+	/*######## 미디어쿼리 #########*/
+		@media all and (min-width:320px) and (max-width:480px){
+			#world_wrap{width:100%;
+				top:50px; background:url('../img/world/world_background_m.jpg');
+				background-size:100%, 100%;
+			}	
+			
+			/*######## info #########*/
+				#info{width:100%; height:35%; position:absolute; bottom:0px; float:none;}
+				#descArea{width:90%; height:320px; margin:0 auto; position:static; right:0; bottom:0;}
+				#descArea ul{width:100%; height:100%;position:relative;}
+				#descArea li{display:none; position:absolute; left:0; top:20px;}
+				#descArea .title{font-size:20px; line-height:30px;}
+				#descArea .title i{font-size:35px;}		
+				#descArea .desc{padding:20px 0 0px; font-size:14px;}
+				#descArea .desc br{display:none;}
+				#descArea .flag{width:90%; left:50%; transform:translatex(-50%); text-align:center;}
+				#descArea .flag a{height:22px;}
+
+				/*li 개별*/
+				#descArea li:first-child .title{font-size:35px; line-height:45px; color:#333;}
+				#descArea li:first-child .desc{font-size:14px;}
+
+			/*######## itemArea #########*/
+				#itemArea{width:100%; height:65%; position:absolute; top:0px; float:none;}
+
+				#itemArea .film li a .title{height:18px; overflow:hidden;}
+				
+				/*320~374까지만 유효. 그 이후로 간격 벌어짐*/
+				#itemArea .film ul{width:80%; margin:0 auto;}
+				#itemArea .film li{width:49%; margin:3% 0;}
+				#itemArea .film li:nth-child(2){margin-left:2%;}
+				#itemArea .film ul:nth-child(2n) li:nth-child(2){margin-left:0; margin-right:2%;}
+				#itemArea .film li a .title{font-size:12px; padding-top:5px;}
+				#itemArea .film li a .desc{display:none;}
+				#itemArea .film li:nth-child(2){transform:translatey(50%);}
+		}
+  </style>
+  <script>
+	$(document).ready(function(){
+		// world_wrap 높이설정(윈도우-헤더높이)
+		var headerH = $("header").height();
+		$("#world_wrap").css({"height":$(window).height()-headerH});
+
+		if($(window).width()<480){
+			$("#world_wrap").css({"height":$(window).height()-100});
+		}
+
+		//스크롤반응
+		$(window).scroll(function(){
+			var now = window.scrollY;
+			var count = Math.floor(now/1000);
+			console.log("count : "+count);
+
+			// 배경 fade
+			if(count>0){
+				$("#itemArea").css({"backgroundColor":"rgba(0,0,0,0.5)"});
+			}
+			else{$("#itemArea").css({"backgroundColor":"rgba(0,0,0,0)"});}
+			
+			// 설명글 fade
+			$("#descArea li").stop().fadeOut(300).removeClass("selected");
+			$("#descArea li:eq("+count+")").stop().fadeIn(500).addClass("selected");
+			
+			// 상품영역
+			$("#itemArea .film").css({"transform":"translatey("+(20-(count*20))+"%)"});
+			$("#itemArea ul").css({"opacity":"0"});
+			$("#itemArea ul:eq("+(count-1)+")").css({"opacity":"1"});
+
+			// 국기
+			$("#descArea .flag a img").css({"outline":"none"});
+			$("#descArea .flag a:eq("+count+") img").css({"outline":"2px solid #333"});
+		});
+
+		// 국기버튼 클릭 시 스크롤 넘어가도록
+		$("#descArea .flag a").bind("focus click", function(){
+			var index = $(this).attr("title").substring(2);
+			//alert(index);
+			$(window).scrollTop(index*1000);
+
+			$("#descArea .flag a img").css({"outline":"none"});
+			$(this).children().css({"outline":"2px solid #333"});
+		});
+		$("#descArea .flag a").bind("blur", function(){
+			$("#descArea .flag a img").css({"outline":"none"});
+		});
+
+		// resize시 아이템 li width 조절
+		var winW = $(window).width();
+		if(winW>=330 && winW<380){
+			$("#itemArea ul").css({"width":"70%"});
+		}
+		else if(winW>=380 && winW<440){
+			$("#itemArea ul").css({"width":"60%"});
+		}
+		else if(winW>=440 && winW<480){
+			$("#itemArea ul").css({"width":"55%"});
+		}
+
+		$(window).resize(function(){
+			winW = $(window).width();
+			console.log(winW);
+			if(winW>=330 && winW<380){
+				$("#itemArea ul").css({"width":"70%"});
+			}
+			else if(winW>=380 && winW<440){
+				$("#itemArea ul").css({"width":"60%"});
+			}
+			else if(winW>=440 && winW<480){
+				$("#itemArea ul").css({"width":"55%"});
+			}
+		});
+	});
+  </script>
+ </head>
+ <body>
+	<div id="wrap">
+		<header id="header">
+			<h1>치즈퀸</h1>
+			<div id="topArea">
+				<div id="infoArea">
+					<ul id="infoMenu">
+<?php if(empty($_SESSION['userid'])){?>
+						<li class="green"><a href="login.html" title="로그인">로그인</a></li>
+						<li><a href="join.html" title="회원가입">회원가입</a></li>
+						<li><a href="login.html" title="장바구니">장바구니</a></li>
+						<li><a href="login.html" title="마이페이지">마이페이지</a></li>
+						<li><a href="login.html" title="고객센터">고객센터</a></li>
+<?php }else{?>
+						<li class="green"><a href="php/logout.php" title="로그아웃">로그아웃</a></li>
+						<li><a href="cart.html" title="장	바구니">장바구니</a></li>
+						<li><a href="mypage.html" title="마이페이지">마이페이지</a></li>
+						<li><a href="notice.php" title="고객센터">고객센터</a></li>
+<?php }?>			
+					</ul>
+					<div class="logo">
+						<a href="../index.php" title="치즈퀸_메인페이지">
+							<img src="../img/header/logo.png" alt="치즈퀸"/>
+						</a>
+					</div>				
+				</div>
+			</div>
+			<div id="gnb">
+				<div id="barArea">
+					<div id="bar">
+						<ul class="nav">
+							<li>
+								<h2>
+									<a href="#none" title="cheese">cheese</a>
+								</h2>
+							</li>
+							<li>
+								<h2>
+									<a href="#none" title="cheese_friends">cheese friends</a>
+								</h2>
+							</li>
+							<li>
+								<h2>
+									<a href="#none" title="기획전">기획전</a>
+								</h2>
+							</li>
+							<li>
+								<h2>
+									<a href="#none" title="sale">sale</a>
+								</h2>
+							</li>
+						</ul>
+						<div class="search">
+							<form action="#" method="GET">
+								<fieldset>
+									<legend>search</legend>
+									<p>
+										<input type="text" id="search" name="search" title="search" placeholder="딸기엔 클로티드 크림"/>
+									</p>
+								</fieldset>
+							</form>
+							<p class="btn">
+								<a href="#none" title="검색버튼">
+									<img src="../img/header/icon_search.png" alt="검색버튼_이미지"/>
+								</a>
+							</p>
+						</div>
+					</div>
+				</div>
+				<div id="dropArea">
+					<div id="drop">
+						<ul>
+							<li>
+								<ul class="subMenu">
+									<li><a href="shopping_cheese.html" title="모짜렐라">모짜렐라</a></li>
+									<li><a href="shopping_cheese.html" title="자연치즈">자연치즈</a></li>
+									<li><a href="shopping_cheese.html" title="스낵·가공치즈">스낵·가공치즈</a></li>
+									<li><a href="shopping_cheese.html" title="크림치즈">크림치즈</a></li>
+									<li><a href="shopping_cheese.html" title="슬라이스치즈">슬라이스치즈</a></li>
+								</ul>
+							</li>
+							<li>
+								<ul class="subMenu">
+									<li><a href="shopping_friends.html" title="잼·시럽·버터·크림">잼·시럽·버터·크림</a></li>
+									<li><a href="shopping_friends.html" title="하몽·살라미">하몽·살라미</a></li>
+									<li><a href="shopping_friends.html" title="올리브·절임·캐비어">올리브·절임·캐비어</a></li>
+									<li><a href="shopping_friends.html" title="오일·비네거·발사믹">오일·비네거·발사믹</a></li>
+									<li><a href="shopping_friends.html" title="소스·향신료·트러플">소스·향신료·트러플</a></li>
+									<li><a href="shopping_friends.html" title="피자·파스타·샌드위치 재료">피자·파스타·샌드위치 재료</a></li>
+									<li><a href="shopping_friends.html" title="음료·간식·요거트">음료·간식·요거트</a></li>
+								</ul>
+							</li>
+							<li>
+								<ul class="subMenu">
+									<li><a href="collection0.html" title="치즈도구">치즈도구</a></li>
+									<li><a href="collection1.html" title="와인안주_추천">와인안주 추천</a></li>
+									<li><a href="collection2.html" title="치즈_초보자_추천">치즈 초보자 추천</a></li>
+									<li><a href="collection3.html" title="선물세트">선물세트</a></li>
+									<li><a href="collection4.html" title="업소용_제품추천">업소용 제품추천</a></li>
+								</ul>
+							</li>
+							<li>
+								<ul class="subMenu">
+									<li><a href="sale.html" title="치즈퀸_세일_모아보기">치즈퀸 세일 모아보기</a></li>
+									<li><a href="sale.html" title="기한임박할인">기한임박할인</a></li>
+								</ul>
+							</li>
+						</ul>
+						<div class="event">
+							<p class="imgs">
+								<a href="event.html" title="event">
+									<span>
+										<img src="../img/header/event.jpg" alt="이벤트이미지"/>
+									</span>
+									<span class="text">
+										<strong>과일과 찰떡궁합!</strong><br/>
+										<em>▶ 클로티드 크림 만나러 가기</em>
+									</span>
+								</a>
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</header>
+		<div id="mobHeader">
+			<div class="top">
+				<p class="logo">
+					<a class="logo" href="../index.php" title="치즈퀸_메인페이지">
+						<img src="../img/header/logo.png" alt="치즈퀸"/>
+					</a>
+				</p>	
+			</div>
+			<div class="bottom">
+				<ul>
+					<li>
+						<a href="../index.php" title="home">
+							<span class="imgs">
+								<img src="../img/basic/icon_home.svg" title="home"/>
+							</span><br/>
+							<strong>홈</strong>
+						</a>
+					</li>
+					<li>
+						<a href="mobCate.html" title="카테고리">
+							<span class="imgs">
+								<img src="../img/basic/icon_cate.svg" title="카테고리"/>
+							</span><br/>
+							<strong>카테고리</strong>
+						</a>
+					</li>
+					<li>
+						<a class="search" href="#none" title="검색">
+							<span class="imgs">
+								<img src="../img/basic/icon_search.svg" title="검색"/>
+							</span><br/>
+							<strong>검색</strong>
+						</a>
+					</li>
+<?php if(empty($_SESSION['userid'])){?>
+					<li>
+						<a href="login.html" title="로그인">
+							<span class="imgs">
+								<img src="../img/basic/icon_mypage.svg" title="로그인"/>
+							</span><br/>
+							<strong>로그인</strong>
+						</a>
+					</li>
+<?php }else{?>
+					<li>
+						<a href="php/logout.php" title="로그아웃">
+							<span class="imgs">
+								<img src="../img/basic/icon_mypage.svg" title="로그아웃"/>
+							</span><br/>
+							<strong>로그아웃</strong>
+						</a>
+					</li>
+<?php }?>	
+				</ul>
+			</div>
+			<p class="allBack"></p>
+			<div id="mobSearchArea">
+				<form action="#" method="GET">
+					<fieldset>
+						<legend>검색영역</legend>
+						<p><input id="mobSearch" type="text" name="mobSearch" title="검색" placeholder="검색어를 입력해주세요."/><span>닫기</span></p>
+					</fieldset>						
+				</form>
+			</div>
+		</div>
+		<div id="container">
+			<!--<div class="guide"></div>-->
+			<div id="world_wrap">
+				<div id="info">
+					<div id="descArea">					
+						<ul>
+							<li class="selected">
+								<strong class="title">떠나자!<br/>치즈로 세계여행!</strong>
+								<div class="desc">
+									치즈퀸이 준비한 세계치즈 콜렉션.<br/>
+									세계 방방곡곡 다양한 풍미의 치즈들과 함께<br/>
+									식탁 위의 여행을 떠나보세요 :)
+								</div>
+							</li>
+							<li class="italy">
+								<strong class="title"><i style="color:#009246;">이탈리아</i><br/>Ciao Formaggio!</strong>
+								<div class="desc">
+									이탈리아 치즈는 약 450종으로 상당히 다양하고 인기가 많습니다.<br/>
+									염소젖을 사용한 특색있는 치즈부터 콤콤한 고르곤졸라,<br/>
+									어느 요리에나 어울리는 파르마지노 레자노 치즈를 추천해요!
+								</div>
+							</li>
+							<li class="switz">
+								<strong class="title"><i style="color:#FF0000;">스위스</i><br/>Gruezi Kase!</strong>
+								<div class="desc">
+									스위스 치즈 삼대장 그뤼에르, 라끌렛, 에멘탈!<br/>
+									열에 살살 녹여 긁어먹는 라끌렛은 '알프스 소녀 하이디'로,<br/>
+									구멍이 송송 나 있는 에멘탈은 '제리 치즈'로 유명하죠.<br/>
+									스위스 치즈와 함께 만화 속 동심으로 떠나보세요.
+								</div>
+							</li>
+							<li class="neth">
+								<strong class="title"><i style="color:#21468B;">네덜란드</i><br/>Hoi Kaas!</strong>
+								<div class="desc">
+									무려 2000년 전에 치즈를 만들기 위해 사용했던 돌 그릇이<br/>
+									발견될 정도로 오랜 역사를 가지고 있는 네덜란드 치즈.<br/>
+									중세시대부터 지금까지 최고를 자랑하는 에담과 고다 치즈는<br/>
+									네덜란드에서 가장 중요한 식재료로 손꼽힌답니다.
+								</div>
+							</li>
+							<li class="usa">
+								<strong class="title"><i style="color:#FFCC32;">미국</i><br/>Hello Cheese!</strong>
+								<div class="desc">
+									'미국 맛' 하면 떠오르는 바로 그 치즈들!<br/>
+									위스콘신의 콜비 치즈와 캘리포니아의 몬테레이 치즈로<br/>
+									미주 여행을 떠나보세요.
+								</div>
+							</li>
+							<li class="france">
+								<strong class="title"><i style="color:#4B218B;">프랑스</i><br/>Bonjour Fromage!</strong>
+								<div class="desc">
+									프랑스 치즈는 요리보다는 치즈 그 자체로 즐기는것이 특징이에요.<br/>
+									가장 대중적인 '프랑스 국민치즈' 콩테부터 노르망디 지역의<br/>
+									까망베르, 치즈의 왕 브리치즈까지 한 자리에 모았어요.
+								</div>
+							</li>
+						</ul>
+						<div class="flag">
+							<a href="#home" title="국가0">
+								<img src="../img/world/icon_home.png" alt="home"/>
+							</a>
+							<a href="#italy" title="국가1">
+								<img src="../img/world/flag_italy.png" alt="italy"/>
+							</a>
+							<a href="#switz" title="국가2">
+								<img src="../img/world/flag_switz.png" alt="switz"/>
+							</a>
+							<a href="#neth" title="국가3">
+								<img src="../img/world/flag_neth.png" alt="neth"/>
+							</a>
+							<a href="#usa" title="국가4">
+								<img src="../img/world/flag_uSA.png" alt="usa"/>
+							</a>
+							<a href="#france" title="국가5">
+								<img src="../img/world/flag_france.png" alt="france"/>
+							</a>
+						</div>
+					</div>				
+				</div>
+				<div id="itemArea">
+					<div class="film">
+						<ul class="italy">
+							<li>
+								<a href="#none" title="상품0">
+									<span class="img">
+										<img src="../img/item/cheese/natural/0601_0.jpg" alt="상품0"/>
+									</span>
+									<span class="text">
+										<strong class="title">만토바 파르미지아노 1kg</strong>
+										<strong class="price">36000원</strong>
+										<i class="desc">
+											갈아먹고, 얇게 저며먹고, 뚝뚝 잘라먹고! 어떻게 먹어도 다 맛나는 진짜 파마산입니다
+										</i>
+									</span>
+								</a>
+							</li>
+							<li>
+								<a href="#none" title="상품0">
+									<span class="img">
+										<img src="../img/item/cheese/natural/0606_0.jpg" alt="상품0"/>
+									</span>
+									<span class="text">
+										<strong class="title">만토바 그라나파다노 1kg</strong>
+										<strong class="price">27200원</strong>
+										<i class="desc">
+											부엌의 남편 그라나파다노! 요리 좀 하신다면 꼭 넣어주세요. 일단 파스타에 듬뿍갈아 올려보시죠!
+										</i>
+									</span>
+								</a>
+							</li>
+							<li>
+								<a href="#none" title="상품0">
+									<span class="img">
+										<img src="../img/item/cheese/natural/0604_0.jpg" alt="상품0"/>
+									</span>
+									<span class="text">
+										<strong class="title">안티코 파르미지아노 150g</strong>
+										<strong class="price">8900원</strong>
+										<i class="desc">
+											깊은 풍미의 경성치즈 파르미지아노 레지아노. 진짜 덩어리 파마산
+										</i>
+									</span>
+								</a>
+							</li>
+						</ul>
+						<ul class="switz">
+							<li>
+								<a href="#none" title="상품0">
+									<span class="img">
+										<img src="../img/item/cheese/natural/0800_0.jpg" alt="상품0"/>
+									</span>
+									<span class="text">
+										<strong class="title">프렌치 에멘탈 블럭 3.5kg</strong>
+										<strong class="price">71400원</strong>
+										<i class="desc">
+											저렴한 가격의 커다란 에멘탈. 업체회원님들께 추천합니다.
+										</i>
+									</span>
+								</a>
+							</li>
+							<li>
+								<a href="#none" title="상품0">
+									<span class="img">
+										<img src="../img/item/cheese/natural/0805_0.jpg" alt="상품0"/>
+									</span>
+									<span class="text">
+										<strong class="title">발마틴 에멘탈 250g</strong>
+										<strong class="price">6400원</strong>
+										<i class="desc">
+											구멍 송송 제리치즈!<br/>
+											만화같은 비쥬얼
+										</i>
+									</span>
+								</a>
+							</li>
+							<li>
+								<a href="#none" title="상품0">
+									<span class="img">
+										<img src="../img/item/cheese/natural/1002_0.jpg" alt="상품0"/>
+									</span>
+									<span class="text">
+										<strong class="title">하르데거 A.O.C. 그뤼에르</strong>
+										<strong class="price">11600원</strong>
+										<i class="desc">
+											남산위 H호텔에서 사용중. 그냥 먹어도, 빵위에 올려 살짝 녹여먹어도 참 맛있습니다
+										</i>
+									</span>
+								</a>
+							</li>
+						</ul>
+						<ul class="neth">
+							<li>
+								<a href="#none" title="상품0">
+									<span class="img">
+										<img src="../img/item/cheese/natural/0714_0.jpg" alt="상품0"/>
+									</span>
+									<span class="text">
+										<strong class="title">베르기어 포션 믹스 6pcs</strong>
+										<strong class="price">9720원</strong>
+										<i class="desc">
+											고다, 에담, 체다, 더블 글로체스터! 유명한 반경성 치즈들이 다모였습니다.
+										</i>
+									</span>
+								</a>
+							</li>
+							<li>
+								<a href="#none" title="상품0">
+									<span class="img">
+										<img src="../img/item/cheese/natural/0702_0.jpg" alt="상품0"/>
+									</span>
+									<span class="text">
+										<strong class="title">베르기어 고다 블록 마일드 5kg</strong>
+										<strong class="price">107500원</strong>
+										<i class="desc">
+											곡물빵과 잘어울립니다. 샌드위치 가게 사장님들께 추천
+										</i>
+									</span>
+								</a>
+							</li>
+							<li>
+								<a href="#none" title="상품0">
+									<span class="img">
+										<img src="../img/item/cheese/natural/0705_0.jpg" alt="상품0"/>
+									</span>
+									<span class="text">
+										<strong class="title">프리코 고다 세미 머츄어 휠 4.5kg</strong>
+										<strong class="price">14400원</strong>
+										<i class="desc">
+											몹시 크고 아름다우며 부드럽고 풍부한 맛이 좋습니다
+										</i>
+									</span>
+								</a>
+							</li>
+						</ul>
+						<ul class="usa">
+							<li>
+								<a href="#none" title="상품0">
+									<span class="img">
+										<img src="../img/item/cheese/snack/001_0.jpg" alt="상품0"/>
+									</span>
+									<span class="text">
+										<strong class="title">캐시밸리 몬트레이잭 치즈</strong>
+										<strong class="price">5560원</strong>
+										<i class="desc">
+											미국이 고향인 정통미국치즈 몬트레이잭치즈. 파스타에 색다르게 몬트레이 한번 뿌려보세요.
+										</i>
+									</span>
+								</a>
+							</li>
+							<li>
+								<a href="#none" title="상품0">
+									<span class="img">
+										<img src="../img/item/cheese/snack/002_0.jpg" alt="상품0"/>
+									</span>
+									<span class="text">
+										<strong class="title">캐시밸리 페퍼잭 치즈</strong>
+										<strong class="price">5560원</strong>
+										<i class="desc">
+											몬트레이 치즈에 고추가 살짝! 매력있는 치즈입니다. 녹여드시면 더 맛있어요!
+										</i>
+									</span>
+								</a>
+							</li>
+							<li>
+								<a href="#none" title="상품0">
+									<span class="img">
+										<img src="../img/item/cheese/snack/003_0.jpg" alt="상품0"/>
+									</span>
+									<span class="text">
+										<strong class="title">캐시밸리 콜비잭 치즈</strong>
+										<strong class="price">5560원</strong>
+										<i class="desc">
+											고소하고 부드러운 맛. 녹여드세요. 감자위에 토스트에 어디든 녹여드세요. :D
+										</i>
+									</span>
+								</a>
+							</li>
+						</ul>
+						<ul class="france">
+							<li>
+								<a href="#none" title="상품0">
+									<span class="img">
+										<img src="../img/item/cheese/natural/0300_0.jpg" alt="상품0"/>
+									</span>
+									<span class="text">
+										<strong class="title">본 마예네 까망베르 250g</strong>
+										<strong class="price">10840원</strong>
+										<i class="desc">
+											프랑스인 고객님들이 고향의 맛 찾을때 이 제품 사가시더라구요. 정통 프렌치 까망베르
+										</i>
+									</span>
+								</a>
+							</li>
+							<li>
+								<a href="#none" title="상품0">
+									<span class="img">
+										<img src="../img/item/cheese/natural/0301_0.jpg" alt="상품0"/>
+									</span>
+									<span class="text">
+										<strong class="title">까망베르 루스티크 250g</strong>
+										<strong class="price">14100원</strong>
+										<i class="desc">
+											고급스런 나무포장 속 까망베르입니다. 맛은 기본, 선물용으로 추천합니다
+										</i>
+									</span>
+								</a>
+							</li>
+							<li>
+								<a href="#none" title="상품0">
+									<span class="img">
+										<img src="../img/item/cheese/natural/0000_0.jpg" alt="상품0"/>
+									</span>
+									<span class="text">
+										<strong class="title">페이장브레통 르 브리 웨지</strong>
+										<strong class="price">11200원</strong>
+										<i class="desc">
+											치즈의 여왕이라 불리우는 흰 곰팡이 치즈로 브르타뉴산 우유로만 만듭니다
+										</i>
+									</span>
+								</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>		
+	</div>
+ </body>
+</html>

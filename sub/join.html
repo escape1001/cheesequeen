@@ -1,0 +1,717 @@
+<?php
+	include "php/00_conn.php";
+	session_cache_expire(30);
+	session_start();
+
+	if(!empty($_SESSION['userid'])){
+		echo "<script>alert('이미 로그인 되어있습니다.'); history.go(-1);</script>";
+	}
+?>
+<!DOCTYPE html>
+<html lang="ko">
+ <head>
+  <title>join</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1"/>
+  <link rel="stylesheet" type="text/css" href="../css/reset.css"/>
+  <link rel="stylesheet" type="text/css" href="../css/header_noTop.css"/>
+  <link rel="stylesheet" type="text/css" href="../css/footer.css"/>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="../js/header.js"></script>
+  <script src="../js/footer.js"></script>
+  <script>
+	/*아이디 중복 체크*/
+	function idChecks(){
+		// alert();
+		var userid = document.getElementById("userid");
+		var warning = document.getElementsByClassName("warning");
+		console.log(userid+" / "+warning);
+
+		if(userid.value==""){
+			alert("아이디가 비어있습니다");
+			userid.focus();
+		}
+		else{
+			xmlhttp = new XMLHttpRequest();
+			xmlhttp.open("GET","php/idDouble.php?q="+userid.value,true);			
+
+			xmlhttp.onreadystatechange = function(){
+				if(xmlhttp.readyState==4 && xmlhttp.status==200){
+					warning[0].innerHTML=xmlhttp.responseText;
+				}
+			};
+
+			xmlhttp.send();
+		}
+	}
+
+	/*비밀번호 체크*/
+	function pwChecks(){
+		var userpw0 = document.getElementById("userpw0");
+		var userpw1 = document.getElementById("userpw1");
+		var warning = document.getElementsByClassName("warning");
+		//alert(userpw0.value+" / "+userpw1.value);
+
+		
+		if(userpw0.value=="" || userpw1.value==""){
+			warning[1].innerHTML="비밀번호를 입력해주세요.";
+		}
+		else if(userpw0.value==userpw1.value){
+			warning[1].innerHTML="<span style='color:#aaa;'>비밀번호가 일치합니다.</span>";
+			//console.log(warning[1]);
+		}
+		else{warning[1].innerHTML="비밀번호가 일치하지 않습니다.";}
+	}
+
+	/*이메일 중복 체크*/
+	function emailChecks(){
+		// alert();
+		var useremail = document.getElementById("useremail");
+		//console.log(useremail);
+		
+		if(useremail.value==""){
+			alert("이메일이 비어있습니다");
+			useremail.focus();
+		}
+		else{
+			xmlhttp = new XMLHttpRequest();
+			xmlhttp.open("GET","php/emailDouble.php?q="+useremail.value,true);			
+
+			xmlhttp.onreadystatechange = function(){
+				if(xmlhttp.readyState==4 && xmlhttp.status==200){
+					alert(xmlhttp.responseText);
+				}
+			};
+
+			xmlhttp.send();
+		}
+	}
+
+	/*전체동의 체크박스*/
+	function allChk(){
+		var agreement = document.getElementById("agreement");
+		var aChk = agreement.getElementsByTagName("input");
+		console.log(aChk.length);
+
+		if(aChk[0].checked==true){
+			for(var i=1; i<aChk.length; i++){
+				aChk[i].checked=true;
+			}
+		}
+		else{
+			for(var i=1; i<aChk.length; i++){
+				aChk[i].checked=false;
+			}
+		}
+	}
+	
+	/*체크박스 기본체크*/
+	function chk(p){
+		var agreement = document.getElementById("agreement");
+		var aChk = agreement.getElementsByTagName("input");
+		console.log(aChk.length);
+		for(var i=1; i<aChk.length; i++){
+				if(aChk[i].checked==false){
+					aChk[0].checked=false;
+				}
+			}
+		
+		switch(p){
+			case "m0" : 
+			if(aChk[4].checked==true){
+				aChk[5].checked=true;
+				aChk[6].checked=true;
+			}
+			else{
+				aChk[5].checked=false;
+				aChk[6].checked=false;
+			}
+			break;
+
+			case "m1" :
+				if(aChk[5].checked==false && aChk[6].checked==false){
+					aChk[4].checked=false;
+				}
+				else if(aChk[5].checked==true || aChk[6].checked==true){
+					aChk[4].checked=true;
+				}
+			break;
+		}
+		
+		
+	}
+  </script>
+  <!--[2] 우편번호 관련 script-->
+  <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+  <script>
+	function postcode(){
+		var add0 = document.getElementsByClassName('add0');
+		var add1 = document.getElementsByClassName('add1');
+
+		add0[0].style.display = "none";
+		add1[0].style.display= "block";
+		add1[1].style.display= "block";
+
+		new daum.Postcode({
+			oncomplete: function(data) {
+				document.getElementById('useradd0').value = data.address;
+				document.getElementById('useradd1').focus();
+			}
+		}).open();
+	}
+  </script>
+  <style>
+	/*##### container #####*/
+		#container{width:100%;}
+
+	/*##### join #####*/
+		#join_wrap{width:100%;}
+		#join_wrap h2{text-align:center; font-size:20px; padding:80px 0 20px;}
+		#join{width:1025px; margin:0 auto;}
+
+		#join form #userInfo{padding:10px 0; border-top:1px solid #aaa; border-bottom:1px solid #aaa;}
+
+		#join form{width:640px; margin:0 auto;}
+		#join form fieldset{width:100%; border:none;}
+		#join form legend{display:none;}
+		#join form table{width:100%;}
+		#join form table th{width:180px; text-align:left; text-indent:20px; font-size:14px; font-weight:400;}
+		#join form ul{width:100%; padding-bottom:20px;}
+		#join form li{width:100%; overflow:hidden; padding-top:20px;}
+		#join form .title{width:180px; height:36px; line-height:36px; text-indent:20px; float:left;}
+		#join form .title label{font-size:14px;}
+		#join form .title label:after,#join form table th:after{content:" *"; color:#cc2935;}
+		#join form .inputArea{width:460px; float:left;}
+		#join form .inputArea p{padding-top:5px;}
+		#join form .inputArea p:first-child{padding-top:0px;}
+		
+		#join form input{width:300px; height:34px; border:1px solid #ccc; border-radius:3px; text-indent:10px; vertical-align:middle; font-family:'score400'; font-size:12px;}
+		#join form input[type="button"]{width:120px; height:36px; margin-left:10px; border:1px solid #00564d; font-family:'score600'; background-color:#fff; color:#00564d; text-indent:0;}
+		#join form input[type="checkbox"]{width:14px; height:14px; margin-right:10px; vertical-align:middle;}
+		.warning{display:block; height:14px; padding-top:5px; text-indent:10px; font-size:10px; color:#cc2935;}
+		.add1{display:none;}
+
+		#join form #phoneCheck{border-color:#ccc; color:#ccc;}
+		#join form #addSearch{width:302px; margin-left:0;}
+		
+		#join form #agreement{padding:10px 0; border-bottom:1px solid #eee;}
+		#join form #agreement th{line-height:30px;}
+		#join form #agreement td{height:30px; line-height:30px; position:relative;}
+		#join form #agreement label[for="agreeAll"]{font-size:14px; font-weight:500;}
+		#join form #agreement .tip{font-size:10px; color:#aaa;}
+		#join form #agreement label{font-size:14px;}
+		#join form #agreement label i{font-style:normal; color:#aaa;}
+		#join form #agreement a{position:absolute; right:50px; top:0; color:#00564d; font-size:14px;}
+		#join form #agreement .Message p{padding-left:26px;}
+		#join form #agreement .Message p:first-child{padding-left:0;}
+
+		#join form fieldset:last-child{padding:40px 0 100px; text-align:center;}
+		#join form #joinSubmit{width:150px; height:40px; line-height:40px; background-color:#00564d; color:#fff; border:none; text-indent:0;  font-size:15px;}
+		
+	/*##### 미디어쿼리 #####*/
+		@media all and (min-width:320px) and (max-width:767px){
+			#container{padding-top:50px;}
+
+			/*##### join #####*/
+				#join_wrap h2{font-size:20px; padding:20px 0;}
+				#join{width:100%; max-width:480px;}
+
+				#join form{width:95%; margin:0 auto;}
+				#join form table th{display:none;}
+				#join form ul{width:100%; padding-bottom:20px;}
+				#join form li{width:100%; overflow:hidden; padding-top:20px;}
+				#join form .title{width:100%; height:36px; line-height:36px; text-indent:0px; float:none;}
+				#join form .title label{font-size:14px;}
+				#join form .inputArea{width:100%; float:none;}
+				#join form .inputArea p{padding-top:5px;}
+				#join form .inputArea p:first-child{padding-top:0px;}
+
+				#join form input{width:99%; height:40px;}
+				#join form input[type="button"]{width:28%; height:40px; margin-left:1%;}
+				#join form input[type="checkbox"]{width:18px; height:18px;}
+				#join form #userid,#join form #useremail,#join form #userphone,#join form #checkNum0,#join form #useradd0{width:68%;}
+
+				#join form #addSearch{width:100%;}
+				
+				#join form #agreement{border-top:1px solid #eee; border-bottom:1px solid #eee;}
+				#join form #agreement label{font-size:12px;}
+				#join form #agreement .tip{padding:5px 0; line-height:14px;}
+				#join form #agreement .Message p{padding-left:30px;}
+				#join form #agreement a{font-size:12px; right:5px;}
+		}
+  </style>
+ </head>
+ <body>
+	<header id="header">
+		<h1>치즈퀸</h1>
+		<div id="topArea">
+			<div id="infoArea">
+				<ul id="infoMenu">
+<?php if(empty($_SESSION['userid'])){?>
+					<li class="green"><a href="login.html" title="로그인">로그인</a></li>
+					<li><a href="join.html" title="회원가입">회원가입</a></li>
+					<li><a href="login.html" title="장바구니">장바구니</a></li>
+					<li><a href="login.html" title="마이페이지">마이페이지</a></li>
+					<li><a href="login.html" title="고객센터">고객센터</a></li>
+<?php }else{?>
+					<li class="green"><a href="php/logout.php" title="로그아웃">로그아웃</a></li>
+					<li><a href="cart.html" title="장	바구니">장바구니</a></li>
+					<li><a href="mypage.html" title="마이페이지">마이페이지</a></li>
+					<li><a href="notice.php" title="고객센터">고객센터</a></li>
+<?php }?>			
+				</ul>
+				<div class="logo">
+					<a href="../index.php" title="치즈퀸_메인페이지">
+						<img src="../img/header/logo.png" alt="치즈퀸"/>
+					</a>
+				</div>				
+			</div>
+		</div>
+		<div id="gnb">
+			<div id="barArea">
+				<div id="bar">
+					<ul class="nav">
+						<li>
+							<h2>
+								<a href="#none" title="cheese">cheese</a>
+							</h2>
+						</li>
+						<li>
+							<h2>
+								<a href="#none" title="cheese_friends">cheese friends</a>
+							</h2>
+						</li>
+						<li>
+							<h2>
+								<a href="#none" title="기획전">기획전</a>
+							</h2>
+						</li>
+						<li>
+							<h2>
+								<a href="#none" title="sale">sale</a>
+							</h2>
+						</li>
+					</ul>
+					<div class="search">
+						<form action="#" method="GET">
+							<fieldset>
+								<legend>search</legend>
+								<p>
+									<input type="text" id="search" name="search" title="search" placeholder="딸기엔 클로티드 크림"/>
+								</p>
+							</fieldset>
+						</form>
+						<p class="btn">
+							<a href="#none" title="검색버튼">
+								<img src="../img/header/icon_search.png" alt="검색버튼_이미지"/>
+							</a>
+						</p>
+					</div>
+				</div>
+			</div>
+			<div id="dropArea">
+				<div id="drop">
+					<ul>
+						<li>
+							<ul class="subMenu">
+								<li><a href="shopping_cheese.html" title="모짜렐라">모짜렐라</a></li>
+								<li><a href="shopping_cheese.html" title="자연치즈">자연치즈</a></li>
+								<li><a href="shopping_cheese.html" title="스낵·가공치즈">스낵·가공치즈</a></li>
+								<li><a href="shopping_cheese.html" title="크림치즈">크림치즈</a></li>
+								<li><a href="shopping_cheese.html" title="슬라이스치즈">슬라이스치즈</a></li>
+							</ul>
+						</li>
+						<li>
+							<ul class="subMenu">
+								<li><a href="shopping_friends.html" title="잼·시럽·버터·크림">잼·시럽·버터·크림</a></li>
+								<li><a href="shopping_friends.html" title="하몽·살라미">하몽·살라미</a></li>
+								<li><a href="shopping_friends.html" title="올리브·절임·캐비어">올리브·절임·캐비어</a></li>
+								<li><a href="shopping_friends.html" title="오일·비네거·발사믹">오일·비네거·발사믹</a></li>
+								<li><a href="shopping_friends.html" title="소스·향신료·트러플">소스·향신료·트러플</a></li>
+								<li><a href="shopping_friends.html" title="피자·파스타·샌드위치 재료">피자·파스타·샌드위치 재료</a></li>
+								<li><a href="shopping_friends.html" title="음료·간식·요거트">음료·간식·요거트</a></li>
+							</ul>
+						</li>
+						<li>
+							<ul class="subMenu">
+								<li><a href="collection0.html" title="치즈도구">치즈도구</a></li>
+								<li><a href="collection1.html" title="와인안주_추천">와인안주 추천</a></li>
+								<li><a href="collection2.html" title="치즈_초보자_추천">치즈 초보자 추천</a></li>
+								<li><a href="collection3.html" title="선물세트">선물세트</a></li>
+								<li><a href="collection4.html" title="업소용_제품추천">업소용 제품추천</a></li>
+							</ul>
+						</li>
+						<li>
+							<ul class="subMenu">
+								<li><a href="sale.html" title="치즈퀸_세일_모아보기">치즈퀸 세일 모아보기</a></li>
+								<li><a href="sale.html" title="기한임박할인">기한임박할인</a></li>
+							</ul>
+						</li>
+					</ul>
+					<div class="event">
+						<p class="imgs">
+							<a href="event.html" title="event">
+								<span>
+									<img src="../img/header/event.jpg" alt="이벤트이미지"/>
+								</span>
+								<span class="text">
+									<strong>과일과 찰떡궁합!</strong><br/>
+									<em>▶ 클로티드 크림 만나러 가기</em>
+								</span>
+							</a>
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</header>
+	<div id="mobHeader">
+		<div class="top">
+			<p class="logo">
+				<a class="logo" href="../index.php" title="치즈퀸_메인페이지">
+					<img src="../img/header/logo.png" alt="치즈퀸"/>
+				</a>
+			</p>	
+		</div>
+		<div class="bottom">
+			<ul>
+				<li>
+					<a href="../index.php" title="home">
+						<span class="imgs">
+							<img src="../img/basic/icon_home.svg" title="home"/>
+						</span><br/>
+						<strong>홈</strong>
+					</a>
+				</li>
+				<li>
+					<a href="mobCate.html" title="카테고리">
+						<span class="imgs">
+							<img src="../img/basic/icon_cate.svg" title="카테고리"/>
+						</span><br/>
+						<strong>카테고리</strong>
+					</a>
+				</li>
+				<li>
+					<a class="search" href="#none" title="검색">
+						<span class="imgs">
+							<img src="../img/basic/icon_search.svg" title="검색"/>
+						</span><br/>
+						<strong>검색</strong>
+					</a>
+				</li>
+<?php if(empty($_SESSION['userid'])){?>
+				<li>
+					<a href="login.html" title="로그인">
+						<span class="imgs">
+							<img src="../img/basic/icon_mypage.svg" title="로그인"/>
+						</span><br/>
+						<strong>로그인</strong>
+					</a>
+				</li>
+<?php }else{?>
+				<li>
+					<a href="php/logout.php" title="로그아웃">
+						<span class="imgs">
+							<img src="../img/basic/icon_mypage.svg" title="로그아웃"/>
+						</span><br/>
+						<strong>로그아웃</strong>
+					</a>
+				</li>
+<?php }?>	
+			</ul>
+		</div>
+		<p class="allBack"></p>
+		<div id="mobSearchArea">
+			<form action="#" method="GET">
+				<fieldset>
+					<legend>검색영역</legend>
+					<p><input id="mobSearch" type="text" name="mobSearch" title="검색" placeholder="검색어를 입력해주세요."/><span>닫기</span></p>
+				</fieldset>						
+			</form>
+		</div>
+	</div>
+	<div id="container">
+		<section id="join_wrap">
+			<h2>회원가입</h2>
+			<div id="join">
+				<form action="php/join_control.php" method="POST">
+					<fieldset id="userInfo">
+						<legend>기본정보</legend>
+						<ul>
+							<li>
+								<p class="title"><label for="userid">아이디</label></p>
+								<p class="inputArea">
+									<input type="text" id="userid" name="userid" autofocus required placeholder="6자 이상의 영문 혹은 영문과 숫자를 조합"/>
+									<input type="button" id="idCheck" title="아이디_중복확인" value="중복 확인" onclick="idChecks();"/>
+									<span class="warning"></span>
+								</p>
+							</li>
+							<li>
+								<p class="title"><label for="userpw0">비밀번호</label></p>
+								<p class="inputArea">
+									<input type="password" id="userpw0" name="userpw0" required placeholder="비밀번호를 입력해주세요"/>
+								</p>
+							</li>
+							<li>
+								<p class="title"><label for="userpw1">비밀번호 확인</label></p>
+								<p class="inputArea">
+									<input type="password" id="userpw1" name="userpw1" required placeholder="비밀번호를 한번 더 입력해주세요" onfocusout="pwChecks();"/>
+									<span class="warning"></span>
+								</p>
+							</li>
+							<li>
+								<p class="title"><label for="username">이름</label></p>
+								<p class="inputArea">
+									<input type="text" id="username" name="username" required placeholder="이름을 입력해주세요"/>
+								</p>
+							</li>
+							<li>
+								<p class="title"><label for="useremail">이메일</label></p>
+								<p class="inputArea">
+									<input type="email" id="useremail" name="useremail" required placeholder="예 : cheesequeen@cheesequeen.com"/>
+									<input type="button" id="emailCheck" title="이메일_중복확인" value="중복 확인" onclick="emailChecks();"/>
+								</p>
+							</li>
+							<li>
+								<p class="title"><label for="userphone">휴대폰</label></p>
+								<div class="inputArea">
+									<p>
+										<input type="tel" id="userphone" name="userphone" required placeholder="-을 포함하여 입력해주세요" pattern="\d{3}-\d{3,4}-\d{4}" title="ex) 010-1234-5678"/>
+										<!--<input type="button" id="phoneCheck" title="인증번호_받기" value="인증번호 받기"/>-->
+									</p>
+									<!--<p>
+										<input type="text" id="checkNum0" name="checkNum0" required/>
+										<input type="button" id="checkNum1" title="인증번호_확인" value="인증번호 확인"/>
+									</p>-->
+								</div>
+							</li>
+							<li>
+								<p class="title"><label for="useraddress0">주소</label></p>
+								<div class="inputArea">
+									<p class="add0">	
+										<input type="button" id="addSearch" title="주소검색" value="주소검색" onclick="postcode();"/>
+									</p>
+									<p class="add1">
+										<input type="text" id="useradd0" name="useradd0" required/>
+										<input type="button" id="addResearch" title="주소_재검색" value="재검색" onclick="postcode();"/>
+									</p>
+									<p class="add1">
+										<input type="text" id="useradd1" name="useradd1" title="상세주소" required/>
+									</p>
+								</div>
+							</li>
+						</ul>
+					</fieldset>
+					<fieldset id="agreement">
+						<legend>이용약관동의</legend>
+							<table>
+								<tr>
+									<th rowspan="6">이용약관동의</th>
+									<td>
+										<p>
+											<input type="checkbox" id="agreeAll" name="agreeAll" checked onclick="allChk();"/><label for="agreeAll">전체 동의합니다</label>
+										</p>
+										<p class="tip">선택항목에 동의하지 않은 경우도 회원가입 및 일반적인 서비스를 이용할 수 있습니다.</p>
+									</td>
+								<tr>
+									<td>
+										<input type="checkbox" id="agreeUsing" name="agreeUsing" required checked onclick="chk();"/><label for="agreeUsing">이용약관 동의 <i>(필수)</i></label>
+										<a href="#" title="이용약관보기">약관보기 ></a>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<input type="checkbox" id="agreeInfo0" name="agreeInfo0" required checked onclick="chk();"/><label for="agreeInfo0">개인정보처리방침 동의 <i>(필수)</i></label>
+										<a href="#" title="이용약관보기">약관보기 ></a>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<input type="checkbox" id="agreeInfo1" name="agreeInfo1" checked onclick="chk();"/><label for="agreeInfo1">개인정보처리방침 동의 <i>(선택)</i></label>
+										<a href="#" title="이용약관보기">약관보기 ></a>
+									</td>
+								</tr>
+								<tr>
+									<td class="Message">
+										<p>
+											<input type="checkbox" id="agreeMessage" name="agreeMessage" checked onclick="chk('m0');"/><label for="agreeMessage">무료배송, 할인쿠폰 등 혜택/정보 수신 동의 <i>(선택)</i></label>
+										</p>
+										<p>
+											<input type="checkbox" id="agreeSms" name="agreeSms" checked onclick="chk('m1');"/><label for="agreeSms">SMS</label>
+											<input type="checkbox" id="agreeEmail" name="agreeEmail" checked onclick="chk('m1');"/><label for="agreeEmail">이메일</label>
+										</p>
+										<p class="tip">회원가입관련, 주문배송관련 등의 SMS는 수신동의와 상관없이 구매 회원에게 발송됩니다.</p>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<input type="checkbox" id="age" name="age" required checked onclick="chk();"/><label for="age">본인은 만 14세 이상입니다. <i>(필수)</i></label>
+									</td>
+								</tr>
+							</table>
+					</fieldset>
+					<fieldset>
+						<input type="submit" id="joinSubmit" title="가입하기" value="가입하기"/>
+					</fieldset>
+				</form>
+			</div>
+		</section>
+		<div id="fixed_wrap">
+			<div id="top">
+				<a href="#" title="top_button">
+					<img src="../img/basic/icon_top_yellow.png" alt="top_button"/>
+				</a>
+			</div>
+		</div>
+	</div>
+	<div id="footer">
+		<div id="footer_desc_wrap">
+			<div id="footer_desc">
+				<div class="cs">
+					<h3>고객센터</h3>
+					<p class="call">
+						<img src='../img/footer/call.png' alt='call_icon'/> 02.425.6117
+					</p>
+					<p class="desc">
+						<span>
+							<b>상담시간</b> 14:00 ~ 18:00
+						</span>
+						<span>
+							<b>휴&nbsp;&nbsp;&nbsp;&nbsp;무</b> 공휴일 전날, 공휴일&amp;주말
+						</span>
+						<span>
+							휴일, 주말에는 게시판을 이용해주세요.
+						</span>
+					</p>
+				</div>
+				<div class="bank">
+					<h3>계좌안내</h3>
+					<p class="imgs">
+						<img src="../img/footer/kbBank.png" alt="bank_logo"/>
+					</p>
+					<p class="desc">
+						<strong>836301-04-125192</strong><em>예금주 : 씨큐컴퍼니</em>
+					</p>
+				</div>
+				<div class="board">
+					<h3>NOTICE <em>공지사항</em></h3>
+					<p class="more">
+						<a href="notice.php" title="공지사항_페이지">+</a>
+					</p>
+					<ul>
+						<li>
+							<a href="notice.php" title="공지사항_페이지0">
+								[공지] 2020 크리스마스 배송안내
+							</a>
+						</li>
+						<li>
+							<a href="notice.php" title="공지사항_페이지1">
+								[이벤트] 2020 유러피안 치즈데이
+							</a>
+						</li>
+						<li>
+							<a href="notice.php" title="공지사항_페이지2">
+								[공지] 2020 한글날 배송안내
+							</a>
+						</li>
+						<li>
+							<a href="notice.php" title="공지사항_페이지3">
+								[배송] 2020 추석연휴 배송안내
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="board">
+					<h3>FAQ <em>자주 묻는 질문</em></h3>
+					<p class="more">
+						<a href="faq.php" title="FAQ_페이지">+</a>
+					</p>
+					<ul>
+						<li>
+							<a href="faq.php" title="FAQ_페이지0">
+								[회원] 등급별 혜택
+							</a>
+						</li>
+						<li>
+							<a href="faq.php" title="FAQ_페이지1">
+								[결제] 로그인하면 네이버(N)페이 버튼이 안보여요. 
+							</a>
+						</li>
+						<li>
+							<a href="faq.php" title="FAQ_페이지2">
+								[배송] 당일발송 마감시각은 언제인가요?
+							</a>
+						</li>
+						<li>
+							<a href="faq.php" title="FAQ_페이지3">
+								[배송] 치즈퀸은 로젠택배와 롯데택배를 이용합니다.
+							</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div id="footer_nav_wrap">
+			<div id="footer_nav">
+				<ul>
+					<li><a href="company.html" title="회사소개">회사소개</a> |</li>
+					<li><a href="agreement.html" title="이용약관">이용약관</a> |</li>
+					<li><a href="privacy.html" title="개인정보취급방침">개인정보취급방침</a> |</li>
+					<li><a href="guide.html" title="이용안내">이용안내</a></li>
+				</ul>
+			</div>
+		</div>
+		<div id="footer_info_wrap">
+			<div class="more_mob">
+				기업 정보 보기 <span><img src="../img/basic/arrow_under_555.png" alt="화살표"/></span>
+			</div>
+			<div id="footer_info">
+				<h2>
+					<img src="../img/basic/logo_thumb.png" alt="치즈퀸"/>
+				</h2>
+				<div class="desc">
+					<ul>
+						<li>
+							<b>사업자등록번호</b> : <span class="textLink"><a href="https://www.ftc.go.kr/bizCommPop.do?wrkr_no=4031587592&apv_perm_no=" title="사업자정보확인" onclick="popup('https://www.ftc.go.kr/bizCommPop.do?wrkr_no=4031587592&apv_perm_no=','사업자등록번호확인'); return false;" >403-15-87592</a></span> <i>|</i>
+						</li>
+						<li>
+							<b>대표자</b> : 김민수, 유민 <i>|</i>
+						</li>
+						<li>
+							<b>통신판매업신고</b> : 제 2015-서울송파-0977호
+						</li>
+						<li>
+							경기도 하남시 광암로 176번길 72 <i>|</i>
+						</li>
+						<li>
+							<b>TEL</b> : 02-425-6117 <i>|</i>
+						</li>
+						<li>
+							<b>FAX</b> : 02-425-6118
+						</li>
+						<li>
+							<b>개인정보관리책임자</b> : 유민 <i>|</i>
+						</li>
+						<li>
+							<b>메일문의</b> : <span><a href="mailto:2cheesequeen@gmail" title="메일문의" >es.c.ape1001@hanmail.net</a></span>
+						</li>
+						<li class="copy">
+							&copy; 2021 es.c.ape1001 ALL RIGHT RESERVED
+						</li>
+					</ul>
+				</div>
+				<div class="pay">
+					<p>
+						<a href="https://mark.inicis.com/mark/popup_v1.php?mid=GBFchee301" title="이니페이_페이지" onclick="popup('https://mark.inicis.com/mark/popup_v1.php?mid=GBFchee301','이니페이_페이지'); return false;">
+							<img src="../img/footer/inipay.png" alt="이니페이_이미지"/>
+						</a>
+						<a href="https://mark.inicis.com/mark/escrow_popup.php?mid=ESGBchee30" title="에스크로_페이지"  onclick="popup('https://mark.inicis.com/mark/escrow_popup.php?mid=ESGBchee30','에스크로_페이지','500','500'); return false;">
+							<img src="../img/footer/escrow.png" alt="에스크로_이미지"/>
+						</a>
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+ </body>
+</html>

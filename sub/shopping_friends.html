@@ -1,0 +1,1600 @@
+<?php
+	include "php/00_conn.php";
+	session_cache_expire(30);
+	session_start();
+?>
+<!DOCTYPE html>
+<html lang="ko">
+ <head>
+  <title>shopping</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1"/>
+  <link rel="stylesheet" type="text/css" href="../css/reset.css"/>
+  <link rel="stylesheet" type="text/css" href="../css/header_noTop.css"/>
+  <link rel="stylesheet" type="text/css" href="../css/footer.css"/>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="../js/header.js"></script>
+  <script src="../js/footer.js"></script>
+  <style>
+	/*##### container #####*/
+		#container{width:100%;}
+
+	/*##### shopping #####*/
+		#shopping_wrap{width:100%; padding:30px 0 100px;}
+		#shopping{width:1025px; margin:0 auto; background-color:#fff;}
+		#shopping h2{width:100%; height:30px; line-height:35px; font-size:20px; text-indent:20px;}
+		#shopping h2 i{vertical-align:middle;}
+		#shopping h2 a{display:none;}
+
+		#cheeseMenu{width:100%; height:40px; padding-top:10px;}
+		#cheeseMenu ul{width:76%; height:100%; line-height:17px; float:left;}
+		#cheeseMenu li{width:12%; height:98%;
+			font-size:13px; text-align:center;
+			border-bottom:1px solid #ccc;
+			float:left;			
+		}
+		#cheeseMenu li:first-child, #cheeseMenu li:nth-child(3){line-height:30px;}
+		#cheeseMenu .bar{width:0; height:2px; background-color:#00564d; position:absolute; left:0; top:0; text-indent:-9999px;}
+
+		#cheeseMenu li p{width:100%; height:100%;}
+		#cheeseMenu li p a{display:block; width:100%; height:100%;}
+
+		#cheeseMenu .select{width:24%; height:100%; float:left;}
+		#cheeseMenu .select select{border:none; color:#aaa; font-family:'score400';}
+
+		#itemArea{width:100%; padding-top:30px;}
+		#itemArea .items{width:80%; float:left;}
+		#itemArea .items li{width:240px; padding-right:15px; float:left;}
+		#itemArea .items li p,#itemArea .items li div{width:100%;}
+		#itemArea .items li a{display:block; width:100%; height:100%;}
+		#itemArea .items li .imgs{height:240px; overflow:hidden;}
+		#itemArea .items li .imgs a img{width:100%; transform:scale(1); transition:transform 0.3s ease-out;}
+		#itemArea .items li:hover .imgs a img,#itemArea .items li .imgs a:focus img{transform:scale(1.1);}
+
+		#itemArea .items li .text{padding-top:10px; height:130px;}
+		#itemArea .items li .text .title{height:30px; line-height:30px; }
+		#itemArea .items li .text .title a{color:#333; font-family:'score700'; overflow:hidden; font-size:14px;}
+
+		#itemArea .items li .text .price{font-size:14px; color:#00564d; font-family:'score700';}
+		#itemArea .items li .text .price i{font-size:12px; font-style:normal; font-family:'score400'; color:#aaa; text-decoration:line-through; margin-right:10px;}
+		#itemArea .items li .text .desc{padding-top:10px; color:#999; font-size:12px;}
+		
+		
+		#itemArea aside{width:20%; float:left; position:relative;}
+		#itemArea .tag{width:100%; display:none; position:absolute; left:0; top:0;}
+		#itemArea .tag li{width:110px; height:28px; line-height:28px; text-align:center; margin-bottom:10px; animation:fadein 0.5s 1;}
+		#itemArea .tag li a{display:block; background-color:#ddd; border-radius:14px; font-size:14px; transition:background-color 0.3s ease-out,color 0.3s ease-out;}
+		
+		@keyframes fadein{
+			0%{opacity:0;}
+			100%{opacity:1;}
+		}
+		#itemArea .tag li:nth-child(2){animation-duration:0.7s;}
+		#itemArea .tag li:nth-child(3){animation-duration:0.9s;}
+		#itemArea .tag li:nth-child(4){animation-duration:1.1s;}
+		#itemArea .tag li:nth-child(5){animation-duration:1.3s;}
+		#itemArea .tag li:nth-child(6){animation-duration:1.5s;}
+		#itemArea .tag li:nth-child(7){animation-duration:1.7s;}
+
+		#itemArea .tag .selected a{background-color:#F4BC00; color:#fff;}
+
+		#itemArea:after{content:""; display:block; clear:both;}
+
+	/*##### 미디어쿼리 #####*/
+		@media all and (min-width:320px) and (max-width:480px){
+			/*##### shopping #####*/
+				#shopping_wrap{padding:90px 0 50px;}
+				#shopping{width:100%; margin:0;}
+				#shopping h2{height:50px; padding-top:10px; line-height:50px; text-align:center; text-indent:0; background-color:#fff; position:fixed; top:0; left:0; z-index:1;}
+				#shopping h2 a{display:inline; position:absolute; left:10%;}
+
+				#cheeseMenu{width:100%; height:40px; line-height:40px; overflow-x:auto; overflow-y:hidden; background-color:#fff;
+				position:fixed; top:60px; left:0; z-index:1;}
+				#cheeseMenu ul{width:800px; height:100%; float:none;}
+				#cheeseMenu li{width:100px; height:98%;
+					font-size:13px; text-align:center;
+					float:left;
+				}
+				#cheeseMenu li:first-child, #cheeseMenu li:nth-child(3){line-height:40px;}
+				#cheeseMenu li p{width:100%; height:100%;}
+				#cheeseMenu li p a{display:block; width:100%; height:100%;}				
+
+				#cheeseMenu li a:hover,#cheeseMenu li a:focus,#cheeseMenu .selected a{color:#00564d;}
+				#cheeseMenu .selected{border-color:#00564d;}
+
+				#cheeseMenu .select,#cheeseMenu .bar{display:none;}
+
+				#itemArea{width:100%; padding-top:30px;}
+				#itemArea .items{width:95%; margin:0 auto; float:none;}
+				#itemArea .items li{width:48%; padding:0 1%;}
+				#itemArea .items li .imgs{height:auto;}
+				#itemArea .items li:hover .imgs a img,#itemArea .items li .imgs a:focus img{transform:scale(1);}
+
+				#itemArea .items li .text{padding-top:5px; height:170px;}
+				#itemArea .items li .text .title{height:auto; line-height:20px;}
+				#itemArea .items li .text .title a{font-family:'score500';}
+
+				#itemArea .items li .text .price{padding-top:10px; font-size:14px; color:#00564d; font-family:'score700';}
+				#itemArea .items li .text .price i{font-size:12px; font-style:normal; font-family:'score400'; color:#aaa; text-decoration:line-through; margin-right:10px;}
+				#itemArea .items li .text .desc{padding-top:10px; color:#999; font-size:12px;}			
+				
+				#itemArea .items:after{content:""; display:block; clear:both;}
+
+				#itemArea aside{display:none;}		
+		}
+ </style>
+ <script>
+		jQuery(document).ready(function(){
+			/*##### 상품네비 #####*/
+			// 언더바 이동
+			jQuery("#cheeseMenu .bar").css({
+				"left":$("#cheeseMenu li:first").offset().left,
+				"top":$("#cheeseMenu li:first").offset().top+$("#cheeseMenu li:first").height(),
+				"width":$("#cheeseMenu li:first").width()
+			});
+			
+			// 클릭 시 상품노출+사이드네비 등장
+			jQuery("#cheeseMenu li a").click(function(){
+				jQuery("#cheeseMenu .bar").animate({
+					"left":$(this).offset().left
+				});
+				jQuery("#cheeseMenu li").removeClass("selected");
+				jQuery(this).parent().parent().addClass("selected");
+
+				switch($(this).attr("title")){
+					case "전체보기" :
+					$(".items li").stop().fadeIn(500);
+					$("aside ul").stop().fadeOut(500);
+					break;
+
+					case "잼" :
+					$(".items li").stop().fadeOut(300);
+					$(".items .jam").stop().fadeIn(500);
+					$("aside ul").stop().fadeOut(500);
+					$("aside .jam").stop().show();
+					$("aside .jam li a").css({"backgroundColor":"#ddd","color":"#333"});
+					$("aside .jam li:first a").css({"backgroundColor":"#F4BC00","color":"#fff"});
+					$("#cheeseMenu").animate({"scrollLeft":"0"});
+					break;
+
+					case "하몽" :
+					$(".items li").stop().fadeOut(300);
+					$(".items .jamon").stop().fadeIn(500);
+					$("aside ul").stop().fadeOut(500);
+					$("aside .jamon").stop().show();
+					$("aside .jamon li a").css({"backgroundColor":"#ddd","color":"#333"});
+					$("aside .jamon li:first a").css({"backgroundColor":"#F4BC00","color":"#fff"});
+					$("#cheeseMenu").animate({"scrollLeft":"150px"});
+					break;
+
+					case "올리브" :
+					$(".items li").stop().fadeOut(300);
+					$(".items .olive").stop().fadeIn(500);
+					$("aside ul").stop().fadeOut(500);
+					$("aside .olive").stop().show();
+					$("aside .olive li a").css({"backgroundColor":"#ddd","color":"#333"});
+					$("aside .olive li:first a").css({"backgroundColor":"#F4BC00","color":"#fff"});
+					$("#cheeseMenu").animate({"scrollLeft":"250px"});
+					break;
+
+					case "오일" :
+					$(".items li").stop().fadeOut(300);
+					$(".items .oil").stop().fadeIn(500);
+					$("aside ul").stop().fadeOut(500);
+					$("aside .oil").stop().show();
+					$("aside .oil li a").css({"backgroundColor":"#ddd","color":"#333"});
+					$("aside .oil li:first a").css({"backgroundColor":"#F4BC00","color":"#fff"});
+					$("#cheeseMenu").animate({"scrollLeft":"350px"});
+					break;
+
+					case "소스" :
+					$(".items li").stop().fadeOut(300);
+					$(".items .spice").stop().fadeIn(500);
+					$("aside ul").stop().fadeOut(500);
+					$("aside .spice").stop().show();
+					$("aside .spice li a").css({"backgroundColor":"#ddd","color":"#333"});
+					$("aside .spice li:first a").css({"backgroundColor":"#F4BC00","color":"#fff"});
+					$("#cheeseMenu").animate({"scrollLeft":"500px"});
+					break;
+
+					case "피자" :
+					$(".items li").stop().fadeOut(300);
+					$(".items .pizza").stop().fadeIn(500);
+					$("aside ul").stop().fadeOut(500);
+					$("aside .pizza").stop().show();
+					$("aside .pizza li a").css({"backgroundColor":"#ddd","color":"#333"});
+					$("aside .pizza li:first a").css({"backgroundColor":"#F4BC00","color":"#fff"});
+					$("#cheeseMenu").animate({"scrollLeft":"500px"});
+					break;
+
+					case "음료" :
+					$(".items li").stop().fadeOut(300);
+					$(".items .drink").stop().fadeIn(500);
+					$("aside ul").stop().fadeOut(500);
+					$("aside .drink").stop().show();
+					$("aside .drink li a").css({"backgroundColor":"#ddd","color":"#333"});
+					$("aside .drink li:first a").css({"backgroundColor":"#F4BC00","color":"#fff"});
+					$("#cheeseMenu").animate({"scrollLeft":"500px"});
+					break;
+				}
+			});
+			
+
+			/*##### 사이드네비 #####*/
+			jQuery("#itemArea .tag li").click(function(){
+				jQuery(this).siblings().find("a").css({"backgroundColor":"#ddd","color":"#333"});
+				jQuery(this).find("a").css({"backgroundColor":"#F4BC00","color":"#fff"});
+
+				var navSel = $(this).find("a").attr("href").substring(1);
+				console.log(navSel);
+				$(".items li").stop().fadeOut(300);
+				$(".items ."+navSel).stop().fadeIn(500);
+			});
+
+		});
+ </script>
+ </head>
+ <body>
+	<header id="header">
+		<h1>치즈퀸</h1>
+		<div id="topArea">
+			<div id="infoArea">
+				<ul id="infoMenu">
+<?php if(empty($_SESSION['userid'])){?>
+					<li class="green"><a href="login.html" title="로그인">로그인</a></li>
+					<li><a href="join.html" title="회원가입">회원가입</a></li>
+					<li><a href="login.html" title="장바구니">장바구니</a></li>
+					<li><a href="login.html" title="마이페이지">마이페이지</a></li>
+					<li><a href="login.html" title="고객센터">고객센터</a></li>
+<?php }else{?>
+					<li class="green"><a href="php/logout.php" title="로그아웃">로그아웃</a></li>
+					<li><a href="cart.html" title="장	바구니">장바구니</a></li>
+					<li><a href="mypage.html" title="마이페이지">마이페이지</a></li>
+					<li><a href="notice.php" title="고객센터">고객센터</a></li>
+<?php }?>			
+				</ul>
+				<div class="logo">
+					<a href="../index.php" title="치즈퀸_메인페이지">
+						<img src="../img/header/logo.png" alt="치즈퀸"/>
+					</a>
+				</div>				
+			</div>
+		</div>
+		<div id="gnb">
+			<div id="barArea">
+				<div id="bar">
+					<ul class="nav">
+						<li>
+							<h2>
+								<a href="#none" title="cheese">cheese</a>
+							</h2>
+						</li>
+						<li>
+							<h2>
+								<a href="#none" title="cheese_friends">cheese friends</a>
+							</h2>
+						</li>
+						<li>
+							<h2>
+								<a href="#none" title="기획전">기획전</a>
+							</h2>
+						</li>
+						<li>
+							<h2>
+								<a href="#none" title="sale">sale</a>
+							</h2>
+						</li>
+					</ul>
+					<div class="search">
+						<form action="#" method="GET">
+							<fieldset>
+								<legend>search</legend>
+								<p>
+									<input type="text" id="search" name="search" title="search" placeholder="딸기엔 클로티드 크림"/>
+								</p>
+							</fieldset>
+						</form>
+						<p class="btn">
+							<a href="#none" title="검색버튼">
+								<img src="../img/header/icon_search.png" alt="검색버튼_이미지"/>
+							</a>
+						</p>
+					</div>
+				</div>
+			</div>
+			<div id="dropArea">
+				<div id="drop">
+					<ul>
+						<li>
+							<ul class="subMenu">
+								<li><a href="shopping_cheese.html" title="모짜렐라">모짜렐라</a></li>
+								<li><a href="shopping_cheese.html" title="자연치즈">자연치즈</a></li>
+								<li><a href="shopping_cheese.html" title="스낵·가공치즈">스낵·가공치즈</a></li>
+								<li><a href="shopping_cheese.html" title="크림치즈">크림치즈</a></li>
+								<li><a href="shopping_cheese.html" title="슬라이스치즈">슬라이스치즈</a></li>
+							</ul>
+						</li>
+						<li>
+							<ul class="subMenu">
+								<li><a href="shopping_friends.html" title="잼·시럽·버터·크림">잼·시럽·버터·크림</a></li>
+								<li><a href="shopping_friends.html" title="하몽·살라미">하몽·살라미</a></li>
+								<li><a href="shopping_friends.html" title="올리브·절임·캐비어">올리브·절임·캐비어</a></li>
+								<li><a href="shopping_friends.html" title="오일·비네거·발사믹">오일·비네거·발사믹</a></li>
+								<li><a href="shopping_friends.html" title="소스·향신료·트러플">소스·향신료·트러플</a></li>
+								<li><a href="shopping_friends.html" title="피자·파스타·샌드위치 재료">피자·파스타·샌드위치 재료</a></li>
+								<li><a href="shopping_friends.html" title="음료·간식·요거트">음료·간식·요거트</a></li>
+							</ul>
+						</li>
+						<li>
+							<ul class="subMenu">
+								<li><a href="collection0.html" title="치즈도구">치즈도구</a></li>
+								<li><a href="collection1.html" title="와인안주_추천">와인안주 추천</a></li>
+								<li><a href="collection2.html" title="치즈_초보자_추천">치즈 초보자 추천</a></li>
+								<li><a href="collection3.html" title="선물세트">선물세트</a></li>
+								<li><a href="collection4.html" title="업소용_제품추천">업소용 제품추천</a></li>
+							</ul>
+						</li>
+						<li>
+							<ul class="subMenu">
+								<li><a href="sale.html" title="치즈퀸_세일_모아보기">치즈퀸 세일 모아보기</a></li>
+								<li><a href="sale.html" title="기한임박할인">기한임박할인</a></li>
+							</ul>
+						</li>
+					</ul>
+					<div class="event">
+						<p class="imgs">
+							<a href="event.html" title="event">
+								<span>
+									<img src="../img/header/event.jpg" alt="이벤트이미지"/>
+								</span>
+								<span class="text">
+									<strong>과일과 찰떡궁합!</strong><br/>
+									<em>▶ 클로티드 크림 만나러 가기</em>
+								</span>
+							</a>
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</header>
+	<div id="mobHeader">
+		<div class="top">
+			<p class="logo">
+				<a class="logo" href="../index.php" title="치즈퀸_메인페이지">
+					<img src="../img/header/logo.png" alt="치즈퀸"/>
+				</a>
+			</p>	
+		</div>
+		<div class="bottom">
+			<ul>
+				<li>
+					<a href="../index.php" title="home">
+						<span class="imgs">
+							<img src="../img/basic/icon_home.svg" title="home"/>
+						</span><br/>
+						<strong>홈</strong>
+					</a>
+				</li>
+				<li>
+					<a href="mobCate.html" title="카테고리">
+						<span class="imgs">
+							<img src="../img/basic/icon_cate.svg" title="카테고리"/>
+						</span><br/>
+						<strong>카테고리</strong>
+					</a>
+				</li>
+				<li>
+					<a class="search" href="#none" title="검색">
+						<span class="imgs">
+							<img src="../img/basic/icon_search.svg" title="검색"/>
+						</span><br/>
+						<strong>검색</strong>
+					</a>
+				</li>
+<?php if(empty($_SESSION['userid'])){?>
+				<li>
+					<a href="login.html" title="로그인">
+						<span class="imgs">
+							<img src="../img/basic/icon_mypage.svg" title="로그인"/>
+						</span><br/>
+						<strong>로그인</strong>
+					</a>
+				</li>
+<?php }else{?>
+				<li>
+					<a href="php/logout.php" title="로그아웃">
+						<span class="imgs">
+							<img src="../img/basic/icon_mypage.svg" title="로그아웃"/>
+						</span><br/>
+						<strong>로그아웃</strong>
+					</a>
+				</li>
+<?php }?>	
+			</ul>
+		</div>
+		<p class="allBack"></p>
+		<div id="mobSearchArea">
+			<form action="#" method="GET">
+				<fieldset>
+					<legend>검색영역</legend>
+					<p><input id="mobSearch" type="text" name="mobSearch" title="검색" placeholder="검색어를 입력해주세요."/><span>닫기</span></p>
+				</fieldset>						
+			</form>
+		</div>
+	</div>
+	<div id="container">
+		<section id="shopping_wrap">
+			<h5>상품페이지</h5>
+			<div id="shopping">
+				<h2><a href="mobCate.html" title="카테고리">&lt;</a><i><img src="../img/basic/logo_friends.png" alt="치즈친구아이콘"/></i> CHEESE FRIENDS</h2>
+				<nav id="cheeseMenu">
+					<ul>
+						<li class="selected">
+							<p>
+								<a href="#none" title="전체보기">전체보기</a>
+							</p>
+						</li>
+						<li>
+							<p>
+								<a href="#none" title="잼">잼·시럽·버터·<br/>크림</a>
+							</p>
+						</li>
+						<li>
+							<p>
+								<a href="#none" title="하몽">하몽·살라미</a>
+							</p>
+						</li>
+						<li>
+							<p>
+								<a href="#none" title="올리브">올리브·절임·<br/>캐비어</a>
+							</p>
+						</li>
+						<li>
+							<p>
+								<a href="#none" title="오일">오일·비네거·<br/>발사믹</a>
+							</p>
+						</li>
+						<li>
+							<p>
+								<a href="#none" title="소스">소스·향신료·<br/>트러플</a>
+							</p>
+						</li>
+						<li>
+							<p>
+								<a href="#none" title="피자">피자·파스타·<br/>샌드위치 재료</a>
+							</p>
+						</li>
+						<li>
+							<p>
+								<a href="#none" title="음료">음료·간식·<br/>요거트</a>
+							</p>
+						</li>
+					</ul>
+					<p class="select">
+						<select id="sort">
+							<option value="추천순">추천순</option>
+							<option value="신상품순">신상품순</option>
+							<option value="인기상품순">인기상품순</option>
+							<option value="낮은가격순">낮은 가격순</option>
+							<option value="높은가격순">높은 가격순</option>
+						</select>
+					</p>
+					<p class="bar">nav bar</p>
+				</nav>
+				<div id="itemArea">					
+					<ul class="items">
+						<li class="jam ja">
+							<p class="imgs">
+								<a href="item.html" title="상품페이지0">
+									<img src="../img/item/friends/jam/000_0.jpg" alt="상품이미지0"/>
+								</a>
+							</p>
+							<div class="text">
+								<p class="title">
+									<a href="item.html" title="상품페이지0">
+										샹 달프 금귤잼 284g (금귤 35% 함유)
+									</a>
+								</p>
+								<p class="price">
+									7900원
+								</p>
+								<p class="desc">
+								</p>
+							</div>
+						</li>
+						<li class="jam ja">
+							<p class="imgs">
+								<a href="item.html" title="상품페이지0">
+									<img src="../img/item/friends/jam/001_0.jpg" alt="상품이미지0"/>
+								</a>
+							</p>
+							<div class="text">
+								<p class="title">
+									<a href="item.html" title="상품페이지0">
+										샹 달프 블루베리잼 (블루베리 50% 함유) 284g
+									</a>
+								</p>
+								<p class="price">
+									7900원
+								</p>
+								<p class="desc">
+									인공색소, 인공첨가물, 방부제를 전혀 사용하지 않은 천연재료 100%의 블루베리잼
+								</p>
+							</div>
+						</li>
+						<li class="jam ja">
+							<p class="imgs">
+								<a href="item.html" title="상품페이지0">
+									<img src="../img/item/friends/jam/002_0.jpg" alt="상품이미지0"/>
+								</a>
+							</p>
+							<div class="text">
+								<p class="title">
+									<a href="item.html" title="상품페이지0">
+										샹 달프 딸기잼 (딸기 50%함유) 284g
+									</a>
+								</p>
+								<p class="price">
+									7900원
+								</p>
+								<p class="desc">
+									인공색소, 인공첨가물, 방부제를 전혀 사용하지 않은 천연재료 100%의 딸기잼
+								</p>
+							</div>
+						</li>
+						<li class="jam sy">
+							<p class="imgs">
+								<a href="item.html" title="상품페이지0">
+									<img src="../img/item/friends/jam/010_0.jpg" alt="상품이미지0"/>
+								</a>
+							</p>
+							<div class="text">
+								<p class="title">
+									<a href="item.html" title="상품페이지0">
+										버터넛마운틴팜 유기농 메이플 시럽 237ml
+									</a>
+								</p>
+								<p class="price">
+									<i>17000원</i>15300원
+								</p>
+								<p class="desc">
+									인공첨가물, 보존료, 색소 무첨가. 순수 유기농 메이플 시럽100%입니다
+								</p>
+							</div>
+						</li>
+						<li class="jam bu">
+							<p class="imgs">
+								<a href="item.html" title="상품페이지0">
+									<img src="../img/item/friends/jam/020_0.jpg" alt="상품이미지0"/>
+								</a>
+							</p>
+							<div class="text">
+								<p class="title">
+									<a href="item.html" title="상품페이지0">
+										기(Ghee) 이지 버터오일 500g
+									</a>
+								</p>
+								<p class="price">
+									<i>29500원</i>21900원
+								</p>
+								<p class="desc">
+									다양한 요리에 버터의 고소한 풍미를 더하세요! (가열요리가능 정제버터)
+								</p>
+							</div>
+						</li>
+						<li class="jam bu">
+							<p class="imgs">
+								<a href="item.html" title="상품페이지0">
+									<img src="../img/item/friends/jam/021_0.jpg" alt="상품이미지0"/>
+								</a>
+							</p>
+							<div class="text">
+								<p class="title">
+									<a href="item.html" title="상품페이지0">
+										만토바 이탈리안 고메버터 250g (무염)
+									</a>
+								</p>
+								<p class="price">
+									<i>6200원</i>5270원
+								</p>
+								<p class="desc">
+									리뷰확인필수! 풍미 좋은. 이탈리아에서 인정받는 유가공 브랜드 만토바 고메버터. 품질과 가격 둘다 아름다와요!
+								</p>
+							</div>
+						</li>
+						<li class="jam cr">
+							<p class="imgs">
+								<a href="item.html" title="상품페이지0">
+									<img src="../img/item/friends/jam/030_0.jpg" alt="상품이미지0"/>
+								</a>
+							</p>
+							<div class="text">
+								<p class="title">
+									<a href="item.html" title="상품페이지0">
+										엘엔비르 마스카포네 1L
+									</a>
+								</p>
+								<p class="price">
+									20800원
+								</p>
+								<p class="desc">
+									요즘 제과업계에서 핫하게 떠오르고 있는 마스카르포네 팩제품입니다. 가격대비 품질이 좋아 전문가들에게 인기가 높습니다
+								</p>
+							</div>
+						</li>
+						<li class="jamon ja2">
+							<p class="imgs">
+								<a href="item.html" title="상품페이지0">
+									<img src="../img/item/friends/jamon/000_0.jpg" alt="상품이미지0"/>
+								</a>
+							</p>
+							<div class="text">
+								<p class="title">
+									<a href="item.html" title="상품페이지0">
+										빌라르 이베리코 하몽 세보 슬라이스 50g
+									</a>
+								</p>
+								<p class="price">
+									8400원
+								</p>
+								<p class="desc">
+								</p>
+							</div>
+						</li>
+						<li class="jamon ja2">
+							<p class="imgs">
+								<a href="item.html" title="상품페이지0">
+									<img src="../img/item/friends/jamon/001_0.jpg" alt="상품이미지0"/>
+								</a>
+							</p>
+							<div class="text">
+								<p class="title">
+									<a href="item.html" title="상품페이지0">
+										에스푸나 초리조 드 하몽 스낵 50g
+									</a>
+								</p>
+								<p class="price">
+									5020원
+								</p>
+								<p class="desc">
+									안주플래터를 장식해줄 최고의 하몽스낵!
+								</p>
+							</div>
+						</li>
+						<li class="jamon sal">
+							<p class="imgs">
+								<a href="item.html" title="상품페이지0">
+									<img src="../img/item/friends/jamon/010_0.jpg" alt="상품이미지0"/>
+								</a>
+							</p>
+							<div class="text">
+								<p class="title">
+									<a href="item.html" title="상품페이지0">
+										에스푸나 살라미 슬라이스 100g
+									</a>
+								</p>
+								<p class="price">
+									8840원
+								</p>
+								<p class="desc">
+									피자토핑으로 매우 추천합니다
+								</p>
+							</div>
+						</li>
+						<li class="jamon cho">
+							<p class="imgs">
+								<a href="item.html" title="상품페이지0">
+									<img src="../img/item/friends/jamon/020_0.jpg" alt="상품이미지0"/>
+								</a>
+							</p>
+							<div class="text">
+								<p class="title">
+									<a href="item.html" title="상품페이지0">
+										빌라르 초리조 이베리코 엑스트라 슬라이스 100g
+									</a>
+								</p>
+								<p class="price">
+									8400원
+								</p>
+								<p class="desc">
+								</p>
+							</div>
+						</li>
+						<li class="jamon pro">
+							<p class="imgs">
+								<a href="item.html" title="상품페이지0">
+									<img src="../img/item/friends/jamon/030_0.jpg" alt="상품이미지0"/>
+								</a>
+							</p>
+							<div class="text">
+								<p class="title">
+									<a href="item.html" title="상품페이지0">
+										볼피 롤티니(로톨라) 226g
+									</a>
+								</p>
+								<p class="price">
+									14600원
+								</p>
+								<p class="desc">
+									왕년의 베스트셀러 컴백! 모짜렐라와 프로슈토가 함께 돌돌 말렸습니다. 얇게 썰어 안주로, 살짝 뎁혀 빵위에!
+								</p>
+							</div>
+						</li>
+						<li class="jamon pro">
+							<p class="imgs">
+								<a href="item.html" title="상품페이지0">
+									<img src="../img/item/friends/jamon/061_0.jpg" alt="상품이미지0"/>
+								</a>
+							</p>
+							<div class="text">
+								<p class="title">
+									<a href="item.html" title="상품페이지0">
+										페라리니 프로슈토 꼬또 2.9kg (비정량)
+									</a>
+								</p>
+								<p class="price">
+									140510원
+								</p>
+								<p class="desc">
+									익힌 프로슈토 입니다. 맛있는 샌드위치를 만들고 싶어하시는 업장에 추천합니다
+								</p>
+							</div>
+						</li>
+						<li class="jamon pro">
+							<p class="imgs">
+								<a href="item.html" title="상품페이지0">
+									<img src="../img/item/friends/jamon/063_0.jpg" alt="상품이미지0"/>
+								</a>
+							</p>
+							<div class="text">
+								<p class="title">
+									<a href="item.html" title="상품페이지0">
+										티롤러 쉰켄스펙 슬라이스 GGA 100g(약10매)
+									</a>
+								</p>
+								<p class="price">
+									7060원
+								</p>
+								<p class="desc">
+									허브향이 잡내를 잡아낸 독일 티롤지방의 생햄 스펙입니다. 하몽과 프로슈토같이 돼지 뒷다리로 만들었습니다
+								</p>
+							</div>
+						</li>
+						<li class="jamon salz">
+							<p class="imgs">
+								<a href="item.html" title="상품페이지0">
+									<img src="../img/item/friends/jamon/040_0.jpg" alt="상품이미지0"/>
+								</a>
+							</p>
+							<div class="text">
+								<p class="title">
+									<a href="item.html" title="상품페이지0">
+										빌라르 살지촌 이베리코 엑스트라 슬라이스 100g
+									</a>
+								</p>
+								<p class="price">
+									8400원
+								</p>
+								<p class="desc">
+									이베리코(흑돼지)로 만든 살지촌 슬라이스입니다
+								</p>
+							</div>
+						</li>
+						<li class="jamon pua">
+							<p class="imgs">
+								<a href="item.html" title="상품페이지0">
+									<img src="../img/item/friends/jamon/050_0.jpg" alt="상품이미지0"/>
+								</a>
+							</p>
+							<div class="text">
+								<p class="title">
+									<a href="item.html" title="상품페이지0">
+										루지에 구스 푸아그라 블록 75g
+									</a>
+								</p>
+								<p class="price">
+									34800원
+								</p>
+								<p class="desc">
+									130년 전통과 명성의 루지에의 크리미하며 풍부한 거위 푸아그라입니다
+								</p>
+							</div>
+						</li>
+						<li class="olive ol">
+							<p class="imgs">
+								<a href="item.html" title="상품페이지0">
+									<img src="../img/item/friends/olive/000_0.jpg" alt="상품이미지0"/>
+								</a>
+							</p>
+							<div class="text">
+								<p class="title">
+									<a href="item.html" title="상품페이지0">
+										다미코 자이언트 그린 올리브 470g (고형량 270g)
+									</a>
+								</p>
+								<p class="price">
+									8600원
+								</p>
+								<p class="desc">
+								</p>
+							</div>
+						</li>
+						<li class="olive ol">
+							<p class="imgs">
+								<a href="item.html" title="상품페이지0">
+									<img src="../img/item/friends/olive/001_0.jpg" alt="상품이미지0"/>
+								</a>
+							</p>
+							<div class="text">
+								<p class="title">
+									<a href="item.html" title="상품페이지0">
+										마시엘로 블랙올리브 피티드(씨제거) 350g
+									</a>
+								</p>
+								<p class="price">
+									3400원
+								</p>
+								<p class="desc">
+								</p>
+							</div>
+						</li>
+						<li class="olive can">
+							<p class="imgs">
+								<a href="item.html" title="상품페이지0">
+									<img src="../img/item/friends/olive/010_0.jpg" alt="상품이미지0"/>
+								</a>
+							</p>
+							<div class="text">
+								<p class="title">
+									<a href="item.html" title="상품페이지0">
+										체리페퍼 위드 스파이시 크림치즈 280g(고형량 170g)
+									</a>
+								</p>
+								<p class="price">
+									7400원
+								</p>
+								<p class="desc">
+									새콤달콤 작은 피망속에 고소한 크림치즈가 가득. 안주로, 가니쉬로 좋아요. 매력적인 매콤함이 있습니다
+								</p>
+							</div>
+						</li>
+						<li class="olive cav">
+							<p class="imgs">
+								<a href="item.html" title="상품페이지0">
+									<img src="../img/item/friends/olive/020_0.jpg" alt="상품이미지0"/>
+								</a>
+							</p>
+							<div class="text">
+								<p class="title">
+									<a href="item.html" title="상품페이지0">
+										아브루가(청어알) 55g
+									</a>
+								</p>
+								<p class="price">
+									17600원
+								</p>
+								<p class="desc">
+									합리적 가격의 캐비어 대체품인 청어알입니다
+								</p>
+							</div>
+						</li>
+						<li class="olive etc">
+							<p class="imgs">
+								<a href="item.html" title="상품페이지0">
+									<img src="../img/item/friends/olive/000_0.jpg" alt="상품이미지0"/>
+								</a>
+							</p>
+							<div class="text">
+								<p class="title">
+									<a href="item.html" title="상품페이지0">
+										에스카르고(달팽이) 200g (고형량 115g)
+									</a>
+								</p>
+								<p class="price">
+									23540원
+								</p>
+								<p class="desc">
+								</p>
+							</div>
+						</li>
+						<li class="oil o">
+							<p class="imgs">
+								<a href="item.html" title="상품페이지0">
+									<img src="../img/item/friends/oil/000_0.jpg" alt="상품이미지0"/>
+								</a>
+							</p>
+							<div class="text">
+								<p class="title">
+									<a href="item.html" title="상품페이지0">
+										루글리오 화이트 트러플 오일 250ml
+									</a>
+								</p>
+								<p class="price">
+									9300원
+								</p>
+								<p class="desc">
+								</p>
+							</div>
+						</li>
+						<li class="oil o">
+							<p class="imgs">
+								<a href="item.html" title="상품페이지0">
+									<img src="../img/item/friends/oil/001_0.jpg" alt="상품이미지0"/>
+								</a>
+							</p>
+							<div class="text">
+								<p class="title">
+									<a href="item.html" title="상품페이지0">
+										압착 엑스트라버진 올리브유 250ml
+									</a>
+								</p>
+								<p class="price">
+									4900원
+								</p>
+								<p class="desc">
+								</p>
+							</div>
+						</li>
+						<li class="oil o">
+							<p class="imgs">
+								<a href="item.html" title="상품페이지0">
+									<img src="../img/item/friends/oil/002_0.jpg" alt="상품이미지0"/>
+								</a>
+							</p>
+							<div class="text">
+								<p class="title">
+									<a href="item.html" title="상품페이지0">
+										블랑네로 트러플오일 with 송로버섯 슬라이스 100ml
+									</a>
+								</p>
+								<p class="price">
+									<i>32000원</i>28800원
+								</p>
+								<p class="desc">
+									송로버섯조각이 들어있습니다. 트러플 함유량이 다른 트러플오일보다 높아 향이 강해요! (스프레이타입 아님)
+								</p>
+							</div>
+						</li>
+						<li class="oil vin">
+							<p class="imgs">
+								<a href="item.html" title="상품페이지0">
+									<img src="../img/item/friends/oil/010_0.jpg" alt="상품이미지0"/>
+								</a>
+							</p>
+							<div class="text">
+								<p class="title">
+									<a href="item.html" title="상품페이지0">
+										에밀리아 유기농 애플 비네거 250ml
+									</a>
+								</p>
+								<p class="price">
+									4800원
+								</p>
+								<p class="desc">
+								</p>
+							</div>
+						</li>
+						<li class="oil vin">
+							<p class="imgs">
+								<a href="item.html" title="상품페이지0">
+									<img src="../img/item/friends/oil/011_0.jpg" alt="상품이미지0"/>
+								</a>
+							</p>
+							<div class="text">
+								<p class="title">
+									<a href="item.html" title="상품페이지0">
+										에밀리아 유기농 레드와인 비네거 250ml
+									</a>
+								</p>
+								<p class="price">
+									5200원
+								</p>
+								<p class="desc">
+								</p>
+							</div>
+						</li>
+						<li class="oil val">
+							<p class="imgs">
+								<a href="item.html" title="상품페이지0">
+									<img src="../img/item/friends/oil/020_0.jpg" alt="상품이미지0"/>
+								</a>
+							</p>
+							<div class="text">
+								<p class="title">
+									<a href="item.html" title="상품페이지0">
+										플랜틴 블랙 트러플 발사믹 글레이즈 250ml
+									</a>
+								</p>
+								<p class="price">
+									16400원
+								</p>
+								<p class="desc">
+								</p>
+							</div>
+						</li>
+						<li class="oil val">
+							<p class="imgs">
+								<a href="item.html" title="상품페이지0">
+									<img src="../img/item/friends/oil/021_0.jpg" alt="상품이미지0"/>
+								</a>
+							</p>
+							<div class="text">
+								<p class="title">
+									<a href="item.html" title="상품페이지0">
+										클로비스 샴페인 비네거 500ml
+									</a>
+								</p>
+								<p class="price">
+									9600원
+								</p>
+								<p class="desc">
+								</p>
+							</div>
+						</li>
+						<li class="oil val">
+							<p class="imgs">
+								<a href="item.html" title="상품페이지0">
+									<img src="../img/item/friends/oil/022_0.jpg" alt="상품이미지0"/>
+								</a>
+							</p>
+							<div class="text">
+								<p class="title">
+									<a href="item.html" title="상품페이지0">
+										클로비스 프로방스 허브 비네거 250ml
+									</a>
+								</p>
+								<p class="price">
+									9600원
+								</p>
+								<p class="desc">
+								</p>
+							</div>
+						</li>
+						<li class="oil vals">
+							<p class="imgs">
+								<a href="item.html" title="상품페이지0">
+									<img src="../img/item/friends/oil/030_0.jpg" alt="상품이미지0"/>
+								</a>
+							</p>
+							<div class="text">
+								<p class="title">
+									<a href="item.html" title="상품페이지0">
+										빌라 비토리아 모데나 발사믹 글레이즈 IGP 500ml
+									</a>
+								</p>
+								<p class="price">
+									<i>12300원</i>11160원
+								</p>
+								<p class="desc">
+									IGP(이탈리안 지역인증)급 글레이즈를 이 가격에!!! 맛은 기본. 가격이 장점
+								</p>
+							</div>
+						</li>
+						<li class="spice spi">
+							<p class="imgs">
+								<a href="item.html" title="상품페이지0">
+									<img src="../img/item/friends/spice/000_0.jpg" alt="상품이미지0"/>
+								</a>
+							</p>
+							<div class="text">
+								<p class="title">
+									<a href="item.html" title="상품페이지0">
+										베가 카제레 훈제 파프리카 파우더 비터스윗 75g
+									</a>
+								</p>
+								<p class="price">
+									12900원
+								</p>
+								<p class="desc">
+								</p>
+							</div>
+						</li>
+						<li class="spice sau">
+							<p class="imgs">
+								<a href="item.html" title="상품페이지0">
+									<img src="../img/item/friends/spice/010_0.jpg" alt="상품이미지0"/>
+								</a>
+							</p>
+							<div class="text">
+								<p class="title">
+									<a href="item.html" title="상품페이지0">
+										바릴라 바질 파스타 소스 400g (바질 2% 함유)
+									</a>
+								</p>
+								<p class="price">
+									4600원
+								</p>
+								<p class="desc">
+								</p>
+							</div>
+						</li>
+						<li class="spice mus">
+							<p class="imgs">
+								<a href="item.html" title="상품페이지0">
+									<img src="../img/item/friends/spice/020_0.jpg" alt="상품이미지0"/>
+								</a>
+							</p>
+							<div class="text">
+								<p class="title">
+									<a href="item.html" title="상품페이지0">
+										포메리 머스타드 250g
+									</a>
+								</p>
+								<p class="price">
+									11600원
+								</p>
+								<p class="desc">
+									광장동 워커* 호텔에서 사용하는 머스타드. 매력있는 새콤함. 최고급 홀그레인 머스타드
+								</p>
+							</div>
+						</li>
+						<li class="spice tru">
+							<p class="imgs">
+								<a href="item.html" title="상품페이지0">
+									<img src="../img/item/friends/spice/030_0.jpg" alt="상품이미지0"/>
+								</a>
+							</p>
+							<div class="text">
+								<p class="title">
+									<a href="item.html" title="상품페이지0">
+										다미코 트러플소스 130g
+									</a>
+								</p>
+								<p class="price">
+									5800원
+								</p>
+								<p class="desc">
+								</p>
+							</div>
+						</li>
+						<li class="pizza piz">
+							<p class="imgs">
+								<a href="item.html" title="상품페이지0">
+									<img src="../img/item/friends/pizza/000_0.jpg" alt="상품이미지0"/>
+								</a>
+							</p>
+							<div class="text">
+								<p class="title">
+									<a href="item.html" title="상품페이지0">
+										페이장브레통 르 스페셜 피자치즈 슈레드 200g
+									</a>
+								</p>
+								<p class="price">
+									7270원
+								</p>
+								<p class="desc">
+									1~2인 가구를 위한 소용량 피자치즈. 소분도 귀찮으신 분들에게 몹시 매우 유용하지요
+								</p>
+							</div>
+						</li>
+						<li class="pizza pas">
+							<p class="imgs">
+								<a href="item.html" title="상품페이지0">
+									<img src="../img/item/friends/pizza/010_0.jpg" alt="상품이미지0"/>
+								</a>
+							</p>
+							<div class="text">
+								<p class="title">
+									<a href="item.html" title="상품페이지0">
+										펠리체티 유기농 통밀 푸실리 500g
+									</a>
+								</p>
+								<p class="price">
+									<i>6100원</i>4880원
+								</p>
+								<p class="desc">
+								</p>
+							</div>
+						</li>
+						<li class="pizza pas">
+							<p class="imgs">
+								<a href="item.html" title="상품페이지0">
+									<img src="../img/item/friends/pizza/011_0.jpg" alt="상품이미지0"/>
+								</a>
+							</p>
+							<div class="text">
+								<p class="title">
+									<a href="item.html" title="상품페이지0">
+										폴렌타 500g
+									</a>
+								</p>
+								<p class="price">
+									9220원
+								</p>
+								<p class="desc">
+									고소하고 담백한 옥수수 폴렌타. 옥수수죽으로 먹어도 맛있고, 반죽을 굳혀 튀기거나 구워먹어도 고소하니 좋아요
+								</p>
+							</div>
+						</li>
+						<li class="pizza pass">
+							<p class="imgs">
+								<a href="item.html" title="상품페이지0">
+									<img src="../img/item/friends/pizza/020_0.jpg" alt="상품이미지0"/>
+								</a>
+							</p>
+							<div class="text">
+								<p class="title">
+									<a href="item.html" title="상품페이지0">
+										코폴라 몬타나라 토마토 머쉬룸 파스타 소스 350g
+									</a>
+								</p>
+								<p class="price">
+									4600원
+								</p>
+								<p class="desc">
+									토마토 과육 76%, 양송이 10%
+								</p>
+							</div>
+						</li>
+						<li class="pizza sand">
+							<p class="imgs">
+								<a href="item.html" title="상품페이지0">
+									<img src="../img/item/friends/pizza/030_0.jpg" alt="상품이미지0"/>
+								</a>
+							</p>
+							<div class="text">
+								<p class="title">
+									<a href="item.html" title="상품페이지0">
+										에스푸나 잠봉 슬라이스 100g
+									</a>
+								</p>
+								<p class="price">
+									6800원
+								</p>
+								<p class="desc">
+									은은한 훈제향이 매력적인 짜지 않은 잠봉!
+								</p>
+							</div>
+						</li>
+						<li class="drink snac">
+							<p class="imgs">
+								<a href="item.html" title="상품페이지0">
+									<img src="../img/item/friends/drink/010_0.jpg" alt="상품이미지0"/>
+								</a>
+							</p>
+							<div class="text">
+								<p class="title">
+									<a href="item.html" title="상품페이지0">
+										치즈팝 고다 20g
+									</a>
+								</p>
+								<p class="price">
+									2500원
+								</p>
+								<p class="desc">
+									혼술용 소포장! 가볍게 뻥 튀겨진 100% 리얼 고다치즈. 탄수화물0, 트랜스지방0, 우유 소금 효소외엔 아무것도 들지 않았어요
+								</p>
+							</div>
+						</li>
+						<li class="drink yog">
+							<p class="imgs">
+								<a href="item.html" title="상품페이지0">
+									<img src="../img/item/friends/drink/020_0.jpg" alt="상품이미지0"/>
+								</a>
+							</p>
+							<div class="text">
+								<p class="title">
+									<a href="item.html" title="상품페이지0">
+										파예 토탈 올 네츄럴 그릭 요거트 500g(유지방 5%)
+									</a>
+								</p>
+								<p class="price">
+									14400원
+								</p>
+								<p class="desc">
+									그리스에서 한달에 2번 비행기로 오는 진짜 그릭요거트. 원하시는 재료를 직접 혼합해 드시는 분들께는 가장 알뜰한 선택입니다
+								</p>
+							</div>
+						</li>
+						<li class="drink cost">
+							<p class="imgs">
+								<a href="item.html" title="상품페이지0">
+									<img src="../img/item/friends/drink/030_0.jpg" alt="상품이미지0"/>
+								</a>
+							</p>
+							<div class="text">
+								<p class="title">
+									<a href="item.html" title="상품페이지0">
+										미니 베이비 벨 (20g * 28개) 560g
+									</a>
+								</p>
+								<p class="price">
+									26800원
+								</p>
+								<p class="desc">
+									빨간 왁스 속에 들어있는 고소 말랑 하얀 치즈. 냄새가 강하지 않아요. 안주로 강추!!!
+								</p>
+							</div>
+						</li>
+					</ul>
+					<aside>
+						<h5>사이드 태그</h5>
+						<ul class="tag jam">
+							<li class="selected">
+								<a href="#jam" title="전체보기">전체보기</a>
+							</li>
+							<li>
+								<a href="#ja" title="잼">#잼</a>
+							</li>							
+							<li>
+								<a href="#sy" title="시럽">#시럽</a>
+							</li>
+							<li>
+								<a href="#bu" title="버터">#버터</a>
+							</li>
+							<li>
+								<a href="#cr" title="크림">#크림</a>
+							</li>
+						</ul>
+						<ul class="tag jamon">
+							<li class="selected">
+								<a href="#jamon" title="전체보기">전체보기</a>
+							</li>
+							<li>
+								<a href="#ja2" title="하몽">#하몽</a>
+							</li>							
+							<li>
+								<a href="#sal" title="살라미">#살라미</a>
+							</li>
+							<li>
+								<a href="#cho" title="초리조">#초리조</a>
+							</li>
+							<li>
+								<a href="#pro" title="프로슈토">#프로슈토</a>
+							</li>
+							<li>
+								<a href="#salz" title="살지촌">#살지촌</a>
+							</li>
+							<li>
+								<a href="#pua" title="푸아그라">#푸아그라</a>
+							</li>
+						</ul>
+						<ul class="tag olive">
+							<li class="selected">
+								<a href="#olive" title="전체보기">전체보기</a>
+							</li>
+							<li>
+								<a href="#ol" title="올리브">#올리브</a>
+							</li>							
+							<li>
+								<a href="#can" title="절임">#절임</a>
+							</li>
+							<li>
+								<a href="#cav" title="캐비어">#캐비어</a>
+							</li>
+							<li>
+								<a href="#etc" title="기타">#기타</a>
+							</li>
+						</ul>
+						<ul class="tag oil">
+							<li class="selected">
+								<a href="#oil" title="전체보기">전체보기</a>
+							</li>
+							<li>
+								<a href="#o" title="오일">#오일</a>
+							</li>							
+							<li>
+								<a href="#vin" title="비네거">#비네거</a>
+							</li>
+							<li>
+								<a href="#val" title="발사믹">#발사믹</a>
+							</li>
+							<li>
+								<a href="#vals" title="발사믹소스">#발사믹 소스</a>
+							</li>
+						</ul>
+						<ul class="tag spice">
+							<li class="selected">
+								<a href="#spice" title="전체보기">전체보기</a>
+							</li>
+							<li>
+								<a href="#spi" title="양념">#양념·향신료</a>
+							</li>							
+							<li>
+								<a href="#sau" title="소스류">#소스류</a>
+							</li>
+							<li>
+								<a href="#mus" title="머스타드">#머스타드</a>
+							</li>
+							<li>
+								<a href="#tru" title="트러플">#트러플</a>
+							</li>
+						</ul>
+						<ul class="tag pizza">
+							<li class="selected">
+								<a href="#pizza" title="전체보기">전체보기</a>
+							</li>
+							<li>
+								<a href="#piz" title="피자치즈">#피자 치즈</a>
+							</li>							
+							<li>
+								<a href="#pas" title="파스타면">#파스타 면</a>
+							</li>
+							<li>
+								<a href="#pass" title="파스타소스">#파스타 소스</a>
+							</li>
+							<li>
+								<a href="#sand" title="샌드위치재료">#샌드위치 재료</a>
+							</li>
+						</ul>
+						<ul class="tag drink">
+							<li class="selected">
+								<a href="#drink" title="전체보기">전체보기</a>
+							</li>
+							<!--<li>
+								<a href="#drin" title="음료">#음료</a>
+							</li>-->		
+							<li>
+								<a href="#snac" title="간식">#간식</a>
+							</li>
+							<li>
+								<a href="#yog" title="요거트">#요거트</a>
+							</li>
+							<li>
+								<a href="#cost" title="코스트코">#코스트코</a>
+							</li>
+						</ul>
+					</aside>					
+				</div>
+			</div>
+		</section>
+		<div id="fixed_wrap">
+			<div id="top">
+				<a href="#" title="top_button">
+					<img src="../img/basic/icon_top_yellow.png" alt="top_button"/>
+				</a>
+			</div>
+		</div>
+	</div>
+	<div id="footer">
+		<div id="footer_desc_wrap">
+			<div id="footer_desc">
+				<div class="cs">
+					<h3>고객센터</h3>
+					<p class="call">
+						<img src='../img/footer/call.png' alt='call_icon'/> 02.425.6117
+					</p>
+					<p class="desc">
+						<span>
+							<b>상담시간</b> 14:00 ~ 18:00
+						</span>
+						<span>
+							<b>휴&nbsp;&nbsp;&nbsp;&nbsp;무</b> 공휴일 전날, 공휴일&amp;주말
+						</span>
+						<span>
+							휴일, 주말에는 게시판을 이용해주세요.
+						</span>
+					</p>
+				</div>
+				<div class="bank">
+					<h3>계좌안내</h3>
+					<p class="imgs">
+						<img src="../img/footer/kbBank.png" alt="bank_logo"/>
+					</p>
+					<p class="desc">
+						<strong>836301-04-125192</strong><em>예금주 : 씨큐컴퍼니</em>
+					</p>
+				</div>
+				<div class="board">
+					<h3>NOTICE <em>공지사항</em></h3>
+					<p class="more">
+						<a href="notice.php" title="공지사항_페이지">+</a>
+					</p>
+					<ul>
+						<li>
+							<a href="notice.php" title="공지사항_페이지0">
+								[공지] 2020 크리스마스 배송안내
+							</a>
+						</li>
+						<li>
+							<a href="notice.php" title="공지사항_페이지1">
+								[이벤트] 2020 유러피안 치즈데이
+							</a>
+						</li>
+						<li>
+							<a href="notice.php" title="공지사항_페이지2">
+								[공지] 2020 한글날 배송안내
+							</a>
+						</li>
+						<li>
+							<a href="notice.php" title="공지사항_페이지3">
+								[배송] 2020 추석연휴 배송안내
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="board">
+					<h3>FAQ <em>자주 묻는 질문</em></h3>
+					<p class="more">
+						<a href="faq.php" title="FAQ_페이지">+</a>
+					</p>
+					<ul>
+						<li>
+							<a href="faq.php" title="FAQ_페이지0">
+								[회원] 등급별 혜택
+							</a>
+						</li>
+						<li>
+							<a href="faq.php" title="FAQ_페이지1">
+								[결제] 로그인하면 네이버(N)페이 버튼이 안보여요. 
+							</a>
+						</li>
+						<li>
+							<a href="faq.php" title="FAQ_페이지2">
+								[배송] 당일발송 마감시각은 언제인가요?
+							</a>
+						</li>
+						<li>
+							<a href="faq.php" title="FAQ_페이지3">
+								[배송] 치즈퀸은 로젠택배와 롯데택배를 이용합니다.
+							</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div id="footer_nav_wrap">
+			<div id="footer_nav">
+				<ul>
+					<li><a href="company.html" title="회사소개">회사소개</a> |</li>
+					<li><a href="agreement.html" title="이용약관">이용약관</a> |</li>
+					<li><a href="privacy.html" title="개인정보취급방침">개인정보취급방침</a> |</li>
+					<li><a href="guide.html" title="이용안내">이용안내</a></li>
+				</ul>
+			</div>
+		</div>
+		<div id="footer_info_wrap">
+			<div class="more_mob">
+				기업 정보 보기 <span><img src="../img/basic/arrow_under_555.png" alt="화살표"/></span>
+			</div>
+			<div id="footer_info">
+				<h2>
+					<img src="../img/basic/logo_thumb.png" alt="치즈퀸"/>
+				</h2>
+				<div class="desc">
+					<ul>
+						<li>
+							<b>사업자등록번호</b> : <span class="textLink"><a href="https://www.ftc.go.kr/bizCommPop.do?wrkr_no=4031587592&apv_perm_no=" title="사업자정보확인" onclick="popup('https://www.ftc.go.kr/bizCommPop.do?wrkr_no=4031587592&apv_perm_no=','사업자등록번호확인'); return false;" >403-15-87592</a></span> <i>|</i>
+						</li>
+						<li>
+							<b>대표자</b> : 김민수, 유민 <i>|</i>
+						</li>
+						<li>
+							<b>통신판매업신고</b> : 제 2015-서울송파-0977호
+						</li>
+						<li>
+							경기도 하남시 광암로 176번길 72 <i>|</i>
+						</li>
+						<li>
+							<b>TEL</b> : 02-425-6117 <i>|</i>
+						</li>
+						<li>
+							<b>FAX</b> : 02-425-6118
+						</li>
+						<li>
+							<b>개인정보관리책임자</b> : 유민 <i>|</i>
+						</li>
+						<li>
+							<b>메일문의</b> : <span><a href="mailto:2cheesequeen@gmail" title="메일문의" >es.c.ape1001@hanmail.net</a></span>
+						</li>
+						<li class="copy">
+							&copy; 2021 es.c.ape1001 ALL RIGHT RESERVED
+						</li>
+					</ul>
+				</div>
+				<div class="pay">
+					<p>
+						<a href="https://mark.inicis.com/mark/popup_v1.php?mid=GBFchee301" title="이니페이_페이지" onclick="popup('https://mark.inicis.com/mark/popup_v1.php?mid=GBFchee301','이니페이_페이지'); return false;">
+							<img src="../img/footer/inipay.png" alt="이니페이_이미지"/>
+						</a>
+						<a href="https://mark.inicis.com/mark/escrow_popup.php?mid=ESGBchee30" title="에스크로_페이지"  onclick="popup('https://mark.inicis.com/mark/escrow_popup.php?mid=ESGBchee30','에스크로_페이지','500','500'); return false;">
+							<img src="../img/footer/escrow.png" alt="에스크로_이미지"/>
+						</a>
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+ </body>
+</html>

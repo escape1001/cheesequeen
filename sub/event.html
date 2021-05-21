@@ -1,0 +1,860 @@
+<?php
+	include "php/00_conn.php";
+	session_cache_expire(30);
+	session_start();
+?>
+<!DOCTYPE html>
+<html lang="ko">
+ <head>
+  <title>event</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1"/>
+  <link rel="stylesheet" type="text/css" href="../css/reset.css"/>
+  <link rel="stylesheet" type="text/css" href="../css/header_noTop.css"/>
+  <link rel="stylesheet" type="text/css" href="../css/footer.css"/>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="../js/header.js"></script>
+  <script src="../js/footer.js"></script>
+  <style>
+	@font-face{
+		src:url('../font/Jalnan.woff');
+		font-family:'jalnan';
+	}
+	/*#### container ####*/
+		#container{min-width:1025px; width:100%;}
+
+	/*#### event ####*/
+		#event{width:100%; background-image:url('../img/sub/event/event_back0.png'); background-size:100%; transition:background 0.5s;}
+		section{width:100%;}
+
+		/*#### object ####*/
+		#object{width:100%; position:relative;}
+		#object div{display:none; animation:obs0 5s infinite alternate;}
+		#object .selected{display:block;}
+		#object p{width:200px; position:absolute;}
+		#object p img{width:100%; animation:obs1 20s infinite alternate ease-in;}
+
+		@keyframes obs0{
+			0%{transform:translatey(0);}
+			100%{transform:translatey(20px);}
+		}
+		@keyframes obs1{
+			0%{transform:rotate(0);}
+			100%{transform:rotate(50deg);}
+		}
+
+		#object .ob0{right:100px; top:100px; transform:rotatey(180deg);}
+		#object .ob1{width:170px; left:200px; top:700px;}
+		#object .ob2{right:200px; top:1500px; transform:rotatey(180deg) rotatez(15deg);}
+
+		/*#### title ####*/
+		#title{height:900px;}
+		#titleArea{width:1025px; text-align:center; height:100%; margin:0 auto;}
+		#titleArea h2{width:100%; font-size:70px; line-height:100px; padding-top:300px; color:#FF6464; font-family:'jalnan'; transition:color 0.5s;}
+		#titleArea p{padding-top:20px; font-size:20px;}
+
+		/*#### select ####*/
+		#select{height:700px;}
+		#selectArea{width:1025px; height:470px; margin:0 auto;}
+
+		#selectArea .imgs{width:450px; height:100%; margin:0 50px 0 30px; overflow:hidden; border-radius:100px 0 100px 0; float:left;}
+		#selectArea .imgs ul{width:100%; height:400%; transition:transform 1s ease-in-out;}
+		#selectArea .imgs li{width:100%; height:25%;  overflow:hidden;}
+		#selectArea .imgs li img{width:100%;}
+
+
+		#selectArea .text{width:460px; height:100%; float:left; }
+		#selectArea .text dl{width:100%; height:100%;}
+		#selectArea .text dl dt{width:100%; padding:15px 0; font-size:36px; font-family:'score700';}
+		#selectArea .text dl dt a{color:#ccc; transition:color .5s;}
+		#selectArea .text dl dt a .more{display:inline-block; width:25px; height:25px; margin-left:10px; padding-bottom:5px; position:relative;}
+		#selectArea .text dl dt a .more i{display:block; width:100%; height:5px; background-color:#ccc; text-indent:-9999px; position:absolute; left:0; top:42%; transition:transform 0.5s, background-color 0.5s;}
+		#selectArea .text dl dt a .more i:last-child{transform:rotate(90deg);}
+		#selectArea .text dl dd{width:100%; max-height:0; overflow:hidden; font-size:18px; line-height:30px; border-bottom:2px solid #ccc; transition:all .5s ease-in-out;}
+
+		
+		/*#### item ####*/
+		#item{height:600px; position:relative;}
+		#item h2{width:200px; height:40px;
+			margin:0 auto;line-height:40px;
+			border-radius:20px; text-align:center; background-color:#FF6464; color:#fff;
+			font-family:'jalnan';
+			transition:background-color 0.5s;
+		}
+
+		.itemArea{width:930px; height:500px; margin:50px auto 0; overflow:hidden; position:relative;}
+		.itemArea ul{width:100%;}
+		.itemArea li{width:310px; padding-bottom:20px; float:left; display:none;}
+		.itemArea .theme0{display:block;}
+
+		.itemArea li a{display:block; width:290px; background-color:#fff; border-radius:10px; box-shadow:5px 5px 10px rgba(0,0,0,0.5); overflow:hidden;}
+		.itemArea li a span{display:block; width:260px; margin:0 auto;}
+		.itemArea li a .imgs{height:260px; margin-top:15px; border-radius:5px; overflow:hidden;}
+		.itemArea li a span img{width:100%;}
+		.itemArea li a .text{padding-top:15px; text-align:center; font-size:14px;}
+		.itemArea li a .text strong{display:block; width:100%; height:20px; overflow:hidden;  color:#333;}
+		.itemArea li a .text em{font-style:normal;}
+		.itemArea li a .text .price{font-weight:700; color:#FF6464; transition:color 0.5s;}
+		.itemArea li a .text .desc{display:block; width:100%; height:80px; padding-top:20px; font-size:13px; color:#aaa; overflow:hidden;}
+		
+		#item p{position:absolute; left:50%; top:45%;}
+		#item p a{display:block;}
+		#item .btn_left{margin-left:-550px;}
+		#item .btn_right{margin-left:515px;}
+		
+		.itemArea ul:after{content:"";display:block;clear:both;}	
+  </style>
+  <script>
+	$(document).ready(function(){
+		// 초기값
+		$("#selectArea .selected a").css({"color":"#FF6464"});
+		$("#selectArea .selected a i").css({"backgroundColor":"#FF6464"});
+		$("#selectArea .selected").next().css({"max-height":"200px","paddingBottom":"10px","borderColor":"#FF6464"});
+		
+		// hover 시 색상변화
+		$("#selectArea dt a").mouseover(function(){
+			var colorH;
+			switch($(this).attr("title")){
+				case "딸기엔 클로티드 크림" : colorH="#FF6464"; break;
+				case "치즈 속에 과일이 퐁당" : colorH="#FFA632"; break;
+				case "베이글에 듬뿍 크림치즈" : colorH="#FF703A"; break;
+				case "사뿐히 내려앉은 허브" : colorH="#3A7658"; break;
+			}
+
+			$(this).css({"color":colorH});
+			$(this).find("i").css({"backgroundColor":colorH});
+			$(this).parent().next().css({"borderColor":colorH});
+		}).mouseout(function(){
+			$("#selectArea dt").not(".selected").find("a").css({"color":"#ccc"});
+			$("#selectArea dt").not(".selected").find("i").css({"backgroundColor":"#ccc"});
+			$("#selectArea dt").not(".selected").next("dd").css({"borderColor":"#ccc"});
+		});
+
+		// 제목 클릭시 텍스트 열리고 컬러,오브젝트 변화
+		$("#selectArea dt").click(function(){
+			$("#selectArea dd").css({"max-height":"0","paddingBottom":"0"});
+			$(this).next().css({"max-height":"200px","paddingBottom":"10px"});
+			
+			// addclass, 객체마다 컬러코드 변수지정
+			$("#selectArea dt").removeClass("selected")
+			$(this).addClass("selected");
+			
+			var className = $("#selectArea .selected").attr("class");
+			//console.log(className);
+			var colors;
+			switch(className){
+				case "d0 selected" :
+				colors = "#FF6464";
+				$("#object div").removeClass("selected");
+				$(".theme0").addClass("selected");
+				$("#event").css({"backgroundImage":"url('../img/sub/event/event_back0.png')"});
+				$("#selectArea .imgs ul").css({"transform":"translatey(0%)"});
+				$("#item li").hide();
+				$("#item .theme0").show();
+				break;
+
+				case "d1 selected" :
+				colors = "#FFA632";
+				$("#object div").removeClass("selected");
+				$(".theme1").addClass("selected");
+				$("#event").css({"backgroundImage":"url('../img/sub/event/event_back1.png')"});
+				$("#selectArea .imgs ul").css({"transform":"translatey(-25%)"});
+				$("#item li").hide();
+				$("#item .theme1").show();
+				break;
+
+				case "d2 selected" :
+				colors = "#FF703A";
+				$("#object div").removeClass("selected");
+				$(".theme2").addClass("selected");
+				$("#event").css({"backgroundImage":"url('../img/sub/event/event_back2.png')"});
+				$("#selectArea .imgs ul").css({"transform":"translatey(-50%)"});
+				$("#item li").hide();
+				$("#item .theme2").show();
+				break;
+
+				case "d3 selected" :
+				colors = "#3A7658";
+				$("#object div").removeClass("selected");
+				$(".theme3").addClass("selected");
+				$("#event").css({"backgroundImage":"url('../img/sub/event/event_back3.png')"});
+				$("#selectArea .imgs ul").css({"transform":"translatey(-75%)"});
+				$("#item li").hide();
+				$("#item .theme3").show();
+				break;
+			}
+			
+			// 클릭 시 색상변화, 밑줄
+			$("#selectArea dt a").css({"color":"#ccc"});
+			$(this).children().css({"color":colors});
+
+			$("#selectArea dd").css({"borderColor":"#ccc"});
+			$(this).next().css({"borderColor":colors});
+			
+			// 테마컬러 적용
+			$("#titleArea h2").css({"color":colors});
+			$("#item h2").css({"backgroundColor":colors});
+			$(".itemArea li a .text .price").css({"color":colors});
+
+			// 아이콘 변화
+			$("#selectArea dt a .more").find("i").css({"backgroundColor":"#ccc"});
+			$(this).find("i").css({"backgroundColor":colors});
+			$("#selectArea dt a .more").find("i:last").css({"transform":"rotate(90deg)"});
+			$(this).find("i:last").css({"transform":"rotate(0deg)"});
+		});		
+	});
+  </script>
+ </head>
+ <body>
+	<div id="wrap">
+		<header id="header">
+			<h1>치즈퀸</h1>
+			<div id="topArea">
+				<div id="infoArea">
+					<ul id="infoMenu">
+<?php if(empty($_SESSION['userid'])){?>
+						<li class="green"><a href="login.html" title="로그인">로그인</a></li>
+						<li><a href="join.html" title="회원가입">회원가입</a></li>
+						<li><a href="login.html" title="장바구니">장바구니</a></li>
+						<li><a href="login.html" title="마이페이지">마이페이지</a></li>
+						<li><a href="login.html" title="고객센터">고객센터</a></li>
+<?php }else{?>
+						<li class="green"><a href="php/logout.php" title="로그아웃">로그아웃</a></li>
+						<li><a href="cart.html" title="장	바구니">장바구니</a></li>
+						<li><a href="mypage.html" title="마이페이지">마이페이지</a></li>
+						<li><a href="notice.php" title="고객센터">고객센터</a></li>
+<?php }?>			
+					</ul>
+					<div class="logo">
+						<a href="../index.php" title="치즈퀸_메인페이지">
+							<img src="../img/header/logo.png" alt="치즈퀸"/>
+						</a>
+					</div>				
+				</div>
+			</div>
+			<div id="gnb">
+				<div id="barArea">
+					<div id="bar">
+						<ul class="nav">
+							<li>
+								<h2>
+									<a href="#none" title="cheese">cheese</a>
+								</h2>
+							</li>
+							<li>
+								<h2>
+									<a href="#none" title="cheese_friends">cheese friends</a>
+								</h2>
+							</li>
+							<li>
+								<h2>
+									<a href="#none" title="기획전">기획전</a>
+								</h2>
+							</li>
+							<li>
+								<h2>
+									<a href="#none" title="sale">sale</a>
+								</h2>
+							</li>
+						</ul>
+						<div class="search">
+							<form action="#" method="GET">
+								<fieldset>
+									<legend>search</legend>
+									<p>
+										<input type="text" id="search" name="search" title="search" placeholder="딸기엔 클로티드 크림"/>
+									</p>
+								</fieldset>
+							</form>
+							<p class="btn">
+								<a href="#none" title="검색버튼">
+									<img src="../img/header/icon_search.png" alt="검색버튼_이미지"/>
+								</a>
+							</p>
+						</div>
+					</div>
+				</div>
+				<div id="dropArea">
+					<div id="drop">
+						<ul>
+							<li>
+								<ul class="subMenu">
+									<li><a href="shopping_cheese.html" title="모짜렐라">모짜렐라</a></li>
+									<li><a href="shopping_cheese.html" title="자연치즈">자연치즈</a></li>
+									<li><a href="shopping_cheese.html" title="스낵·가공치즈">스낵·가공치즈</a></li>
+									<li><a href="shopping_cheese.html" title="크림치즈">크림치즈</a></li>
+									<li><a href="shopping_cheese.html" title="슬라이스치즈">슬라이스치즈</a></li>
+								</ul>
+							</li>
+							<li>
+								<ul class="subMenu">
+									<li><a href="shopping_friends.html" title="잼·시럽·버터·크림">잼·시럽·버터·크림</a></li>
+									<li><a href="shopping_friends.html" title="하몽·살라미">하몽·살라미</a></li>
+									<li><a href="shopping_friends.html" title="올리브·절임·캐비어">올리브·절임·캐비어</a></li>
+									<li><a href="shopping_friends.html" title="오일·비네거·발사믹">오일·비네거·발사믹</a></li>
+									<li><a href="shopping_friends.html" title="소스·향신료·트러플">소스·향신료·트러플</a></li>
+									<li><a href="shopping_friends.html" title="피자·파스타·샌드위치 재료">피자·파스타·샌드위치 재료</a></li>
+									<li><a href="shopping_friends.html" title="음료·간식·요거트">음료·간식·요거트</a></li>
+								</ul>
+							</li>
+							<li>
+								<ul class="subMenu">
+									<li><a href="collection0.html" title="치즈도구">치즈도구</a></li>
+									<li><a href="collection1.html" title="와인안주_추천">와인안주 추천</a></li>
+									<li><a href="collection2.html" title="치즈_초보자_추천">치즈 초보자 추천</a></li>
+									<li><a href="collection3.html" title="선물세트">선물세트</a></li>
+									<li><a href="collection4.html" title="업소용_제품추천">업소용 제품추천</a></li>
+								</ul>
+							</li>
+							<li>
+								<ul class="subMenu">
+									<li><a href="sale.html" title="치즈퀸_세일_모아보기">치즈퀸 세일 모아보기</a></li>
+									<li><a href="sale.html" title="기한임박할인">기한임박할인</a></li>
+								</ul>
+							</li>
+						</ul>
+						<div class="event">
+							<p class="imgs">
+								<a href="event.html" title="event">
+									<span>
+										<img src="../img/header/event.jpg" alt="이벤트이미지"/>
+									</span>
+									<span class="text">
+										<strong>과일과 찰떡궁합!</strong><br/>
+										<em>▶ 클로티드 크림 만나러 가기</em>
+									</span>
+								</a>
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</header>
+		<div id="mobHeader">
+			<div class="top">
+				<p class="logo">
+					<a class="logo" href="../index.php" title="치즈퀸_메인페이지">
+						<img src="../img/header/logo.png" alt="치즈퀸"/>
+					</a>
+				</p>	
+			</div>
+			<div class="bottom">
+				<ul>
+					<li>
+						<a href="../index.php" title="home">
+							<span class="imgs">
+								<img src="../img/basic/icon_home.svg" title="home"/>
+							</span><br/>
+							<strong>홈</strong>
+						</a>
+					</li>
+					<li>
+						<a href="mobCate.html" title="카테고리">
+							<span class="imgs">
+								<img src="../img/basic/icon_cate.svg" title="카테고리"/>
+							</span><br/>
+							<strong>카테고리</strong>
+						</a>
+					</li>
+					<li>
+						<a class="search" href="#none" title="검색">
+							<span class="imgs">
+								<img src="../img/basic/icon_search.svg" title="검색"/>
+							</span><br/>
+							<strong>검색</strong>
+						</a>
+					</li>
+<?php if(empty($_SESSION['userid'])){?>
+					<li>
+						<a href="login.html" title="로그인">
+							<span class="imgs">
+								<img src="../img/basic/icon_mypage.svg" title="로그인"/>
+							</span><br/>
+							<strong>로그인</strong>
+						</a>
+					</li>
+<?php }else{?>
+					<li>
+						<a href="php/logout.php" title="로그아웃">
+							<span class="imgs">
+								<img src="../img/basic/icon_mypage.svg" title="로그아웃"/>
+							</span><br/>
+							<strong>로그아웃</strong>
+						</a>
+					</li>
+<?php }?>	
+				</ul>
+			</div>
+			<p class="allBack"></p>
+			<div id="mobSearchArea">
+				<form action="#" method="GET">
+					<fieldset>
+						<legend>검색영역</legend>
+						<p><input id="mobSearch" type="text" name="mobSearch" title="검색" placeholder="검색어를 입력해주세요."/><span>닫기</span></p>
+					</fieldset>						
+				</form>
+			</div>
+		</div>
+		<div id="container">
+			<div id="event">
+				<div id="object">
+					<div class="theme0 selected">
+						<p class="ob0">
+							<img src="../img/sub/event/event_object00.png" alt="오브젝트00"/>
+						</p>
+						<p class="ob1">
+							<img src="../img/sub/event/event_object00.png" alt="오브젝트01"/>
+						</p>
+						<p class="ob2">
+							<img src="../img/sub/event/event_object00.png" alt="오브젝트02"/>
+						</p>
+					</div>
+					<div class="theme1">
+						<p class="ob0">
+							<img src="../img/sub/event/event_object10.png" alt="오브젝트10"/>
+						</p>
+						<p class="ob1">
+							<img src="../img/sub/event/event_object11.png" alt="오브젝트11"/>
+						</p>
+						<p class="ob2">
+							<img src="../img/sub/event/event_object12.png" alt="오브젝트12"/>
+						</p>
+					</div>
+					<div class="theme2">
+						<p class="ob0">
+							<img src="../img/sub/event/event_object20.png" alt="오브젝트20"/>
+						</p>
+						<p class="ob1">
+							<img src="../img/sub/event/event_object21.png" alt="오브젝트21"/>
+						</p>
+						<p class="ob2">
+							<img src="../img/sub/event/event_object22.png" alt="오브젝트22"/>
+						</p>
+					</div>
+					<div class="theme3">
+						<p class="ob0">
+							<img src="../img/sub/event/event_object30.png" alt="오브젝트30"/>
+						</p>
+						<p class="ob1">
+							<img src="../img/sub/event/event_object30.png" alt="오브젝트31"/>
+						</p>
+						<p class="ob2">
+							<img src="../img/sub/event/event_object30.png" alt="오브젝트32"/>
+						</p>
+					</div>
+				</div>
+				<section id="title">
+					<h5>메인타이틀</h5>
+					<article id="titleArea">
+						<h2>
+							티타임에 강추야<br/>
+							디저트 필승조합!
+						</h2>
+						<p>
+							때로는 따뜻한 커피 한잔과 함께, 때로는 향긋한 차에 곁들여서.<br/>
+							오후의 티타임을 완벽하게 만들어줄 치즈퀸의 다양한 디저트 치즈들을 만나보세요
+						</p>
+					</article>
+				</section>
+				<section id="select">
+					<h5>서브타이틀-선택</h5>
+					<div id="selectArea">
+						<div class="imgs">
+							<ul>
+								<li class="on">
+									<img src="../img/sub/event/event_0.jpg" alt="이벤트이미지0"/>
+								</li>
+								<li>
+									<img src="../img/sub/event/event_1.jpg" alt="이벤트이미지1"/>
+								</li>
+								<li>
+									<img src="../img/sub/event/event_2.jpg" alt="이벤트이미지2"/>
+								</li>
+								<li>
+									<img src="../img/sub/event/event_3.jpg" alt="이벤트이미지3"/>
+								</li>
+							</ul>
+						</div>
+						<div class="text">
+							<dl>
+								<dt class="d0 selected">
+									<a href="#none" title="딸기엔 클로티드 크림">
+										딸기엔 클로티드 크림
+										<span class="more">
+											<i>+</i>
+											<i>+</i>
+										</span>
+									</a>
+								</dt>
+								<dd>
+									마스카포네, 클로티드 크림과 설탕, 바닐라빈을 한 데 섞어 뿔이 올라올 때 까지 저어주세요. 짤주머니를 이용해 딸기 사이사이에 크림을 짜 넣어주면 초간단 디저트 완성! 살짝 얼려먹어도 맛있답니다.
+								</dd>
+								<dt class="d1">
+									<a href="#none" title="치즈 속에 과일이 퐁당">
+										치즈 속에 과일이 퐁당
+										<span class="more">
+											<i>+</i>
+											<i>+</i>
+										</span>
+									</a>
+								</dt>
+								<dd>
+									녹진한 치즈 속 고소한 견과류와 상큼한 과일이 콕콕 박혀있는 과일치즈를 소개합니다. 향이 강한 치즈가 부담스럽다면 상큼한 과일 치즈로 가볍게 치즈의 세계에 다가가 보세요.
+								</dd>
+								<dt class="d2">
+									<a href="#none" title="베이글에 듬뿍 크림치즈">
+										베이글에 듬뿍 크림치즈
+										<span class="more">
+											<i>+</i>
+											<i>+</i>
+										</span>
+									</a>
+								</dt>
+								<dd>
+									어떻게 먹어도 맛있는 베이글. 여기에 부드러운 크림치즈와 커피 한 잔을 더하면 이 곳이 바로 뉴욕! 특별한 기분을 내고 싶으시다면 양파나 연어를 곁들이는 것도 추천해요
+								</dd>
+								<dt class="d3">
+									<a href="#none" title="사뿐히 내려앉은 허브">
+										사뿐히 내려앉은 허브
+										<span class="more">
+											<i>+</i>
+											<i>+</i>
+										</span>
+									</a>
+								</dt>
+								<dd>
+									향긋한 허브와 향신료가 가미된 다채로운 풍미의 치즈입니다. 어느 요리에든 쉽게 활용 가능해요. 빵에 쓱 바르면 브런치 메뉴, 채소에 얹어주면 샐러드가 뚝딱! 치즈 그 자체로도 집어먹기 좋은 고품격 와인 안주가 된답니다.
+								</dd>
+							</dl>
+						</div>
+					</div>
+				</section>
+				<section id="item">
+					<h2>MD 추천상품</h2>				
+					<div class="itemArea">
+						<ul>
+							<li class="theme0">
+								<a href="item.html" title="추천상품0">
+									<span class="imgs">
+										<img src="../img/item/cheese/cream/002_0.jpg" alt="추천상품0"/>
+									</span>
+									<span class="text">
+										<strong>데본 클로티드 크림 170g</strong>
+										<em class="price">10600원</em>
+										<em class="desc">
+											버터보단 가볍고, 크리미하며, 농축된 우유맛의 아무데나 발라도 다 맛나는 크림.<br/>치즈퀸 사장의 최고 훼이보릿
+										</em>
+									</span>
+								</a>
+							</li>
+							<li class="theme0">
+								<a href="item.html" title="추천상품0">
+									<span class="imgs">
+										<img src="../img/item/cheese/cream/001_0.jpg" alt="추천상품0"/>
+									</span>
+									<span class="text">
+										<strong>이즈니 프레시 치즈 딸기 150g</strong>
+										<em class="price">5200원</em>
+										<em class="desc">
+											생크림인듯 요거트같은 하얀 크림치즈.<br/>마스카포네와 비슷한 질감. 신선하고 섬세한 산미를 즐겨보세요. 
+										</em>
+									</span>
+								</a>
+							</li>
+							<li class="theme0">
+								<a href="item.html" title="추천상품0">
+									<span class="imgs">
+										<img src="../img/item/cheese/cream/003_0.jpg" alt="추천상품0"/>
+									</span>
+									<span class="text">
+										<strong>마담로익 크림치즈 플레인 150g</strong>
+										<em class="price">11900원</em>
+										<em class="desc">
+											마담로익의 특징을 가장 잘 나타낸 말<br/>" 가벼운 크림치즈" 입속에서 부드럽게 풀려<br/>잔뜩 발라도 부담없어요
+										</em>
+									</span>
+								</a>
+							</li>
+							<li class="theme1">
+								<a href="item.html" title="추천상품1">
+									<span class="imgs">
+										<img src="../img/item/cheese/snack/005_0.jpg" alt="추천상품1"/>
+									</span>
+									<span class="text">
+										<strong>램노스 과일치즈(블루베리) 125g</strong>
+										<em class="price">5400원</em>
+										<em class="desc">
+											달콤 상큼한 블루베리가 씹히는 부담없이 맛좋은 치즈입니다
+										</em>
+									</span>
+								</a>
+							</li>
+							<li class="theme1">
+								<a href="item.html" title="추천상품1">
+									<span class="imgs">
+										<img src="../img/item/cheese/snack/006_0.jpg" alt="추천상품1"/>
+									</span>
+									<span class="text">
+										<strong>램노스 과일치즈(갈릭 차이브) 125g</strong>
+										<em class="price">5400원</em>
+										<em class="desc">
+											허브의 향미가 좋고 맛이 부드러워 와인과 잘 어울려요
+										</em>
+									</span>
+								</a>
+							</li>
+							<li class="theme1">
+								<a href="item.html" title="추천상품1">
+									<span class="imgs">
+										<img src="../img/item/cheese/snack/007_0.jpg" alt="추천상품1"/>
+									</span>
+									<span class="text">
+										<strong>램노스 과일치즈(살구 아몬드) 125g</strong>
+										<em class="price">5400원</em>
+										<em class="desc">
+											살구와 아몬드가 풍성하게 씹혀 상큼고소해요. 대중적인 맛!
+										</em>
+									</span>
+								</a>
+							</li>
+							<li class="theme2">
+								<a href="item.html" title="추천상품1">
+									<span class="imgs">
+										<img src="../img/item/cheese/cream/005_0.jpg" alt="추천상품1"/>
+									</span>
+									<span class="text">
+										<strong>소프트 필라델피아 크림치즈 플레인 200g</strong>
+										<em class="price">5800원</em>
+										<em class="desc">
+											크림치즈의 클래식, 아는 맛, 익숙한 맛, 바로 그맛.
+										</em>
+									</span>
+								</a>
+							</li>
+							<li class="theme2">
+								<a href="item.html" title="추천상품1">
+									<span class="imgs">
+										<img src="../img/item/cheese/cream/004_0.jpg" alt="추천상품1"/>
+									</span>
+									<span class="text">
+										<strong>생 아구르(생 따귀르) 크림 150g</strong>
+										<em class="price">5800원</em>
+										<em class="desc">
+											발라먹는 블루치즈, 예상밖의 조화
+										</em>
+									</span>
+								</a>
+							</li>
+							<li class="theme2">
+								<a href="item.html" title="추천상품1">
+									<span class="imgs">
+										<img src="../img/item/cheese/cream/000_0.jpg" alt="추천상품1"/>
+									</span>
+									<span class="text">
+										<strong>퀘스크렘 갈릭앤허브 크림치즈 200g</strong>
+										<em class="price">5800원</em>
+										<em class="desc">
+											원유는 물론 소금까지, 모든 재료 유기농 크림치즈, EU유기농인증! 상상하시는 그 크림치즈
+										</em>
+									</span>
+								</a>
+							</li>
+							<li class="theme3">
+								<a href="item.html" title="추천상품3">
+									<span class="imgs">
+										<img src="../img/item/cheese/snack/000_0.jpg" alt="추천상품3"/>
+									</span>
+									<span class="text">
+										<strong>따르따르 아페리프레 사뵈르 이탈리에 100g</strong>
+										<em class="price">7380원</em>
+										<em class="desc">
+											정말 아무것도 준비하기 싫을 땐 이거 하나면 안주준비 완료
+										</em>
+									</span>
+								</a>
+							</li>
+							<li class="theme3">
+								<a href="item.html" title="추천상품3">
+									<span class="imgs">
+										<img src="../img/item/cheese/natural/0202_0.jpg" alt="추천상품3"/>
+									</span>
+									<span class="text">
+										<strong>콜리오스 그릭 페타 치즈 150g</strong>
+										<em class="price">5800원</em>
+										<em class="desc">
+											화이트 와인과 어울리는 염소 치즈의 우아한 산미를 느껴보세요
+										</em>
+									</span>
+								</a>
+							</li>
+							<li class="theme3">
+								<a href="item.html" title="추천상품3">
+									<span class="imgs">
+										<img src="../img/item/cheese/natural/0200_0.jpg" alt="추천상품3"/>
+									</span>
+									<span class="text">
+										<strong>알미토 페타치즈 허브 엔 스파이스 280g (고형량160g)</strong>
+										<em class="price">8260원</em>
+										<em class="desc">
+											해바라기씨유 안에 페타치즈와 각종 허브가 향긋 듬뿍 들어있어요. 안주용으로 추천합니다!
+										</em>
+									</span>
+								</a>
+							</li>
+						</ul>
+					</div>
+				</section>
+			</div>
+		</div>
+		<div id="footer">
+			<div id="footer_desc_wrap">
+				<div id="footer_desc">
+					<div class="cs">
+						<h3>고객센터</h3>
+						<p class="call">
+							<img src='../img/footer/call.png' alt='call_icon'/> 02.425.6117
+						</p>
+						<p class="desc">
+							<span>
+								<b>상담시간</b> 14:00 ~ 18:00
+							</span>
+							<span>
+								<b>휴&nbsp;&nbsp;&nbsp;&nbsp;무</b> 공휴일 전날, 공휴일&amp;주말
+							</span>
+							<span>
+								휴일, 주말에는 게시판을 이용해주세요.
+							</span>
+						</p>
+					</div>
+					<div class="bank">
+						<h3>계좌안내</h3>
+						<p class="imgs">
+							<img src="../img/footer/kbBank.png" alt="bank_logo"/>
+						</p>
+						<p class="desc">
+							<strong>836301-04-125192</strong><em>예금주 : 씨큐컴퍼니</em>
+						</p>
+					</div>
+					<div class="board">
+						<h3>NOTICE <em>공지사항</em></h3>
+						<p class="more">
+							<a href="notice.php" title="공지사항_페이지">+</a>
+						</p>
+						<ul>
+							<li>
+								<a href="notice.php" title="공지사항_페이지0">
+									[공지] 2020 크리스마스 배송안내
+								</a>
+							</li>
+							<li>
+								<a href="notice.php" title="공지사항_페이지1">
+									[이벤트] 2020 유러피안 치즈데이
+								</a>
+							</li>
+							<li>
+								<a href="notice.php" title="공지사항_페이지2">
+									[공지] 2020 한글날 배송안내
+								</a>
+							</li>
+							<li>
+								<a href="notice.php" title="공지사항_페이지3">
+									[배송] 2020 추석연휴 배송안내
+								</a>
+							</li>
+						</ul>
+					</div>
+					<div class="board">
+						<h3>FAQ <em>자주 묻는 질문</em></h3>
+						<p class="more">
+							<a href="faq.php" title="FAQ_페이지">+</a>
+						</p>
+						<ul>
+							<li>
+								<a href="faq.php" title="FAQ_페이지0">
+									[회원] 등급별 혜택
+								</a>
+							</li>
+							<li>
+								<a href="faq.php" title="FAQ_페이지1">
+									[결제] 로그인하면 네이버(N)페이 버튼이 안보여요. 
+								</a>
+							</li>
+							<li>
+								<a href="faq.php" title="FAQ_페이지2">
+									[배송] 당일발송 마감시각은 언제인가요?
+								</a>
+							</li>
+							<li>
+								<a href="faq.php" title="FAQ_페이지3">
+									[배송] 치즈퀸은 로젠택배와 롯데택배를 이용합니다.
+								</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div id="footer_nav_wrap">
+				<div id="footer_nav">
+					<ul>
+						<li><a href="company.html" title="회사소개">회사소개</a> |</li>
+						<li><a href="agreement.html" title="이용약관">이용약관</a> |</li>
+						<li><a href="privacy.html" title="개인정보취급방침">개인정보취급방침</a> |</li>
+						<li><a href="guide.html" title="이용안내">이용안내</a></li>
+					</ul>
+				</div>
+			</div>
+			<div id="footer_info_wrap">
+				<div class="more_mob">
+					기업 정보 보기 <span><img src="../img/basic/arrow_under_555.png" alt="화살표"/></span>
+				</div>
+				<div id="footer_info">
+					<h2>
+						<img src="../img/basic/logo_thumb.png" alt="치즈퀸"/>
+					</h2>
+					<div class="desc">
+						<ul>
+							<li>
+								<b>사업자등록번호</b> : <span class="textLink"><a href="https://www.ftc.go.kr/bizCommPop.do?wrkr_no=4031587592&apv_perm_no=" title="사업자정보확인" onclick="popup('https://www.ftc.go.kr/bizCommPop.do?wrkr_no=4031587592&apv_perm_no=','사업자등록번호확인'); return false;" >403-15-87592</a></span> <i>|</i>
+							</li>
+							<li>
+								<b>대표자</b> : 김민수, 유민 <i>|</i>
+							</li>
+							<li>
+								<b>통신판매업신고</b> : 제 2015-서울송파-0977호
+							</li>
+							<li>
+								경기도 하남시 광암로 176번길 72 <i>|</i>
+							</li>
+							<li>
+								<b>TEL</b> : 02-425-6117 <i>|</i>
+							</li>
+							<li>
+								<b>FAX</b> : 02-425-6118
+							</li>
+							<li>
+								<b>개인정보관리책임자</b> : 유민 <i>|</i>
+							</li>
+							<li>
+								<b>메일문의</b> : <span><a href="mailto:2cheesequeen@gmail" title="메일문의" >es.c.ape1001@hanmail.net</a></span>
+							</li>
+							<li class="copy">
+								&copy; 2021 es.c.ape1001 ALL RIGHT RESERVED
+							</li>
+						</ul>
+					</div>
+					<div class="pay">
+						<p>
+							<a href="https://mark.inicis.com/mark/popup_v1.php?mid=GBFchee301" title="이니페이_페이지" onclick="popup('https://mark.inicis.com/mark/popup_v1.php?mid=GBFchee301','이니페이_페이지'); return false;">
+								<img src="../img/footer/inipay.png" alt="이니페이_이미지"/>
+							</a>
+							<a href="https://mark.inicis.com/mark/escrow_popup.php?mid=ESGBchee30" title="에스크로_페이지"  onclick="popup('https://mark.inicis.com/mark/escrow_popup.php?mid=ESGBchee30','에스크로_페이지','500','500'); return false;">
+								<img src="../img/footer/escrow.png" alt="에스크로_이미지"/>
+							</a>
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+ </body>
+</html>

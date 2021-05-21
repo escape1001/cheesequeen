@@ -1,0 +1,30 @@
+*{padding:0;margin:0;}
+li{list-style-type:none;}
+a:link,a:visited{text-decoration:none; color:#333;}
+body{font-family:'score400';}
+h5{position:absolute; left:-9999px; width:1px; height:1px; font-size:1px; line-height:0; overflow:hidden;}
+
+@font-face {
+	font-family:'jalnan';
+	src: url('../font/Jalnan.woff');
+}
+@font-face {
+	font-family:'nanummyeongjo';
+	src: url('../font/NanumMyeongjo.woff');
+}
+@font-face {
+	font-family:'score400';
+	src: url('../font/scdream4.woff');
+}
+@font-face {
+	font-family:'score500';
+	src: url('../font/scdream5.woff');
+}
+@font-face {
+	font-family:'score600';
+	src: url('../font/scdream6.woff');
+}
+@font-face {
+	font-family:'score700';
+	src: url('../font/scdream7.woff');
+}

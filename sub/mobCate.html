@@ -1,0 +1,189 @@
+<?php
+	include "php/00_conn.php";
+	session_cache_expire(30);
+	session_start();
+?>
+<!DOCTYPE html>
+<html lang="ko">
+ <head>
+  <title>Cheese Queen</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1"/>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <style>
+	/*#### reset ####*/
+		*{padding:0;margin:0;}
+		li{list-style-type:none;}
+		a:link,a:visited{text-decoration:none; color:#333;}
+		body{font-family:'score400';}
+		
+		@font-face {
+			font-family:'score400';
+			src: url('../font/scdream4.woff');
+		}
+		
+		#wrap{min-width:320px; width:100%;}
+
+		#mobHeader{width:100%; height:100%;}
+
+		#mobHeader .top{background-color:#fff; width:100%; height:30px; padding:10px 0; position:fixed; top:0; left:0; z-index:1;}
+		#mobHeader .top .logo{width:130px; height:100%;  margin:0 auto;}
+		#mobHeader .top .logo a{display:block; width:100%; height:100%;}
+		#mobHeader .top .logo a img{width:100%;}
+
+		#mobHeader .bottom{background-color:#fff; width:100%; height:50px; position:fixed; bottom:0; left:0; z-index:1; border-top:1px solid #ccc;}
+		#mobHeader .bottom ul{width:100%; height:40px; padding:5px 0;}
+		#mobHeader .bottom li{width:25%; float:left; text-align:center; font-size:10px;}
+
+		#mobHeader #mobCate{width:100%; padding:50px 0;}
+		#mobHeader #mobCate h2{width:100%; height:50px; line-height:50px; border-bottom:1px solid #eee; font-weight:400; font-size:16px; text-indent:20px;}
+		#mobHeader #mobCate ul ul{width:100%; background-color:#eee; display:none;}
+		#mobHeader #mobCate ul ul li{height:40px; line-height:40px; text-indent:40px; font-size:14px;}
+		#mobHeader #mobCate ul ul li a{display:block; width:100%; height:100%;}
+
+		.selected{color:#00564d;}
+
+		.allBack{width:100%; height:100%; position:absolute; left:0; top:0; background-color:rgba(0,0,0,0.5); z-index:1; display:none;}
+		#mobSearchArea{width:100%; height:70px; position:absolute; left:0; top:-70px; background-color:#00564d; z-index:1; transition:top 0.5s;}
+		#mobSearchArea form{width:100%; height:100%;}
+		#mobSearchArea fieldset{width:100%; height:100%; border:none;}
+		#mobSearchArea legend{display:none;}
+		#mobSearchArea p{width:98%; height:100%; padding-left:2%; line-height:60px;}
+		#mobSearchArea p input{width:85%; height:50px; margin:10px 0; border:none; text-indent:10px;}
+		#mobSearchArea p span{display:inline-block; width:15%; color:#fff; text-align:center; cursor:pointer;}
+  </style>
+  <script>
+	jQuery(document).ready(function(){
+		jQuery("#mobCate h2").click(function(){
+			jQuery(this).parent().siblings().children("ul").slideUp(500,"swing");			
+			jQuery(this).next().slideToggle(500,"swing");
+			jQuery("#mobCate h2").removeClass();
+			jQuery(this).addClass("selected");
+		});
+		
+		// 검색창
+		jQuery(".bottom .search").click(function(){
+			jQuery(".allBack").fadeIn();
+			jQuery("#mobSearchArea").css({"top":"0"});
+		});
+
+		jQuery(".allBack, #mobSearchArea span").click(function(){
+			jQuery(".allBack").fadeOut();
+			jQuery("#mobSearchArea").css({"top":"-70px"});
+		});
+	});
+  </script>
+ </head>
+ <body>
+	<div id="wrap">
+		<div id="mobHeader">
+			<div class="top">
+				<p class="logo">
+					<a class="logo" href="../index.html" title="치즈퀸_메인페이지">
+						<img src="../img/header/logo.png" alt="치즈퀸"/>
+					</a>
+				</p>	
+			</div>
+			<div class="bottom">
+				<ul>
+					<li>
+						<a href="../index.php" title="home">
+							<span class="imgs">
+								<img src="../img/basic/icon_home.svg" title="home"/>
+							</span><br/>
+							<strong>홈</strong>
+						</a>
+					</li>
+					<li>
+						<a href="mobCate.html" title="카테고리">
+							<span class="imgs">
+								<img src="../img/basic/icon_cate.svg" title="카테고리"/>
+							</span><br/>
+							<strong>카테고리</strong>
+						</a>
+					</li>
+					<li>
+						<a class="search" href="#none" title="검색">
+							<span class="imgs">
+								<img src="../img/basic/icon_search.svg" title="검색"/>
+							</span><br/>
+							<strong>검색</strong>
+						</a>
+					</li>
+<?php if(empty($_SESSION['userid'])){?>
+					<li>
+						<a href="login.html" title="로그인">
+							<span class="imgs">
+								<img src="../img/basic/icon_mypage.svg" title="로그인"/>
+							</span><br/>
+							<strong>로그인</strong>
+						</a>
+					</li>
+<?php }else{?>
+					<li>
+						<a href="php/logout.php" title="로그아웃">
+							<span class="imgs">
+								<img src="../img/basic/icon_mypage.svg" title="로그아웃"/>
+							</span><br/>
+							<strong>로그아웃</strong>
+						</a>
+					</li>
+<?php }?>	
+				</ul>
+			</div>
+			<div id="mobCate">
+				<ul>
+					<li>
+						<h2>CHEESE</h2>
+						<ul>
+							<li><a href="shopping_cheese.html" title="모짜렐라">모짜렐라</a></li>
+							<li><a href="shopping_cheese.html" title="자연치즈">자연치즈</a></li>
+							<li><a href="shopping_cheese.html" title="스낵·가공치즈">스낵·가공치즈</a></li>
+							<li><a href="shopping_cheese.html" title="크림치즈">크림치즈</a></li>
+							<li><a href="shopping_cheese.html" title="슬라이스치즈">슬라이스치즈</a></li>
+						</ul>
+					</li>
+					<li>
+						<h2>CHEESE FRIENDS</h2>
+						<ul>
+							<li><a href="shopping_friends.html" title="잼·시럽·버터·크림">잼·시럽·버터·크림</a></li>
+							<li><a href="shopping_friends.html" title="하몽·살라미">하몽·살라미</a></li>
+							<li><a href="shopping_friends.html" title="올리브·절임·캐비어">올리브·절임·캐비어</a></li>
+							<li><a href="shopping_friends.html" title="오일·비네거·발사믹">오일·비네거·발사믹</a></li>
+							<li><a href="shopping_friends.html" title="소스·향신료·트러플">소스·향신료·트러플</a></li>
+							<li><a href="shopping_friends.html" title="피자·파스타·샌드위치재료">피자·파스타·샌드위치 재료</a></li>
+							<li><a href="shopping_friends.html" title="음료·간식·요거트">음료·간식·요거트</a></li>
+						</ul>
+					</li>
+					<li>
+						<h2>기획전</h2>
+						<ul>
+							<li><a href="collection0.html" title="치즈도구">치즈도구</a></li>
+							<li><a href="collection1.html" title="와인안주추천">와인안주 추천</a></li>
+							<li><a href="collection2.html" title="치즈초보자추천">치즈 초보자 추천</a></li>
+							<li><a href="collection3.html" title="선물세트">선물세트</a></li>
+							<li><a href="collection4.html" title="업소용제품추천">업소용 제품추천</a></li>
+						</ul>
+					</li>
+					<li>
+						<h2>SALE</h2>
+						<ul>
+							<li><a href="sale.html" title="치즈퀸세일 모아보기">치즈퀸 세일 모아보기</a></li>
+							<li><a href="sale.html" title="기한임박할인">기한임박할인</a></li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+			<p class="allBack"></p>
+			<div id="mobSearchArea">
+				<form action="#" method="GET">
+					<fieldset>
+						<legend>검색영역</legend>
+						<p><input id="mobSearch" type="text" name="mobSearch" title="검색" placeholder="검색어를 입력해주세요."/><span>닫기</span></p>
+					</fieldset>						
+				</form>
+			</div>
+		</div>
+	</div>
+ </body>
+</html>

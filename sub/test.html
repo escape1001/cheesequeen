@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="ko">
+ <head>
+  <title>cheese_test</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1"/>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script> // javascript	
+	var softHard;
+	var normalBlue;
+	var onlyMix;
+	var coldWarm;
+
+	function testQ(userA){
+		switch(userA){
+			case "s" : softHard = "s"; break;
+			case "h" : softHard = "h"; break;
+
+			case "n" : normalBlue = "n"; break;
+			case "b" : normalBlue = "b"; break;
+
+			case "o" : onlyMix = "o"; break;
+			case "m" : onlyMix = "m"; break;
+
+			case "c" : coldWarm = "c"; break;
+			case "w" : coldWarm = "w"; break;
+		}
+	}
+
+	function result(){
+		var result00 = softHard+normalBlue+onlyMix+coldWarm;
+		var rDesc = document.getElementById("rDesc");
+		document.getElementById("mbti").innerText=result00;
+
+		if(onlyMix=="o" && softHard=="h"){
+			rDesc.innerText = "구멍이 송송 난 에멘탈 치즈와 콜비잭치즈를 잘라 나만의 치즈 플래터를 구성해보세요.";
+		}
+		else if(onlyMix=="o" && softHard=="s"){
+			rDesc.innerText = "부드러운 생치즈를 곁들인 카프레제를 추천해요.";
+		}
+		
+		if(softHard=="s"){
+			document.getElementById("sh").innerText="부드러운";
+		}
+		else{document.getElementById("sh").innerText="단단한";}
+
+		if(onlyMix=="o"){
+			document.getElementById("om").innerText="플래터";
+		}
+		else{
+			document.getElementById("om").innerText="요리용";
+			rDesc.innerText = "부엌의 만능해결사! 그라나파다노 치즈로 풍미를 가득 느껴보세요.";
+		}
+
+		if(normalBlue=="n"){
+			document.getElementById("nb").innerText="무난한 ";
+		}
+		else{
+			document.getElementById("nb").innerText="콤콤한 ";
+			rDesc.innerText = "블루치즈의 정석! 고르곤졸라 치즈를 들여보세요.";	
+		}
+	}
+  </script>
+  <script> // jQuery
+	$(document).ready(function(){
+		// 테스트 페이지 넘기기
+		$("#test_main .btn a").click(function(){
+			$("#test_main").slideUp(500,"swing");
+			$(".bar p").css({"width":"20%"});
+			$(".home_btn").animate({"left":"0"});
+
+			$("#testArea .q1 h3").css({"opacity":"100%"});
+			$("#testArea .q1 li").css({"transform":"translatex(0)"});
+		});
+
+		$("#testArea .q a").click(function(){
+			$(this).parent().parent().parent().parent().slideUp(500,"swing");
+
+			$(this).parent().parent().parent().parent().next().find("h3").css({"opacity":"100%"});
+			$(this).parent().parent().parent().parent().next().find("li").css({"transform":"translatex(0)"});
+
+			$(".bar p").css({"width":"+="+($(".bar").width()*0.2)});
+			//console.log($(".bar").width()*0.2);
+
+			if($(this).attr("onclick")=="testQ('n');" || $(this).attr("onclick")=="testQ('b');"){
+				$("#loading").delay(2000).slideUp(500,"swing");
+				$(".home_btn").delay(2000).animate({"left":"-100px"});
+
+				result();
+				var mbti = $("#mbti").text();
+				//console.log(mbti.indexOf("b"));
+
+				if(mbti.indexOf("o")!=-1 &&  mbti.indexOf("s")!=-1){
+					$(".recommend li").hide();
+					$(".recommend .os").css({"display":"inline-block"});
+					$(".rImg img").attr("src","../img/item/cheese/natural/0001_0.jpg");
+				}				
+				else if(mbti.indexOf("b")!=-1){
+					$(".recommend li").hide();
+					$(".recommend .bl").css({"display":"inline-block"});
+					$(".rImg img").attr("src","../img/item/cheese/natural/0503_0.jpg");
+				}
+				else if(mbti.indexOf("m")!=-1){
+					$(".recommend li").hide();
+					$(".recommend .mi").css({"display":"inline-block"});
+					$(".rImg img").attr("src","../img/item/cheese/natural/0604_0.jpg");
+				}
+			}
+		});
+
+	});
+  </script>
+  <style>
+	/*##### reset #####*/
+		*{margin:0;padding:0;}
+		html{height:100%;}
+		body{font-family:'score400'; height:100%;}
+		li{list-style-type:none;}
+		a:link,a:visited{text-decoration:none; color:#333;}
+		img{border:none;}
+		@font-face{
+			font-family:"together";
+			src:url("../font/TT투게더.woff");
+		}
+		@font-face {
+			font-family:'score400';
+			src: url('../font/scdream4.woff');
+		}
+
+	/*#### wrap ####*/
+		#wrap{width:100%; height:100%;  position:relative; overflow:hidden;}
+
+	/*#### header ####*/
+		#header{width:100%; height:100px; text-align:center; position:fixed; top:0; left:0; z-index:2; background-color:#fff;}
+		#header h1{width:300px; height:70px; margin:15px auto;}
+		#header h1 a{display:block; width:100%; height:100%;}
+		#header h1 a img{height:100%;}
+
+		.home_btn{width:100px; height:50px;		
+			background-color:#ffcc32;
+			text-align:center; line-height:50px;
+			position:absolute; left:-100px; top:50%; z-index:1;
+		}
+		.home_btn a{display:block; width:100%; height:100%; color:#fff; font-weight:700;}
+
+	/*#### container ####*/
+		#container{width:95%; height:100%; margin:100px auto 0; position:relative;}
+		#container h2{position:absolute; left:-9999px; width:1px; height:1px; font-size:1px; line-height:0; overflow:hidden;}
+
+		#testArea{width:100%; height:100%; /*overflow-x:hidden; overflow-y:scroll;*/ overflow:hidden; background-image:url('../img/sub/test/test_background.jpg');}
+		#testArea section{width:100%; height:100%;}
+		.color{color:#ffcc32;}
+
+	/*#### test_main ####*/
+		#test_main{position:relative; text-align:center;}
+		#test_main h3{padding-top:250px; font-size:80px; color:#00564d; font-weight:400; font-family:"together";}
+		#test_main .text{padding:40px 0 50px; color:#00564d; font-weight:700; font-size:20px;}
+		
+		/*#### imgs ####*/
+		#test_main .imgs{width:100%; height:100%;
+			position:absolute; left:0; top:0px;  opacity:100%;
+			/*transition:top 0.5s ease-out,opacity 0.5s ease-out;*/
+			animation:fadeIn 1.5s 1,floating 3s infinite alternate linear;
+		}
+		#test_main .imgs img{width:12%; position:absolute;}
+		#test_main .imgs .img0{left:10%; top:10%;}
+		#test_main .imgs .img1{right:10%; top:15%;}
+		#test_main .imgs .img2{left:20%; bottom:23%;}
+		#test_main .imgs .img3{right:16%; bottom:25%;}
+
+		@keyframes floating{
+			0%{transform:translatey(0);}
+			100%{transform:translatey(-2%);}
+		}
+		@keyframes fadeIn{
+			0%{top:-20px;  opacity:0%;}
+			10%{top:-20px;  opacity:0%;}
+			100%{top:0; opacity:100%;}
+		}
+
+		/*#### button####*/
+		#test_main .btn{width:150px; height:50px; margin:0 auto; position:relative; z-index:1;}
+		#test_main .btn a{display:block; width:100%; height:100%; line-height:50px; font-weight:700; border-radius:10px; background-color:#a8c491;}
+
+		/*기능*/
+		#test_main .btn a:hover,#test_main .btn a:focus{background-color:#ffcc32;}
+
+	/*#### q 공통 ####*/
+		.q .imgArea,.q .textArea{width:50%; height:100%; float:left;}
+		
+		/*#### imgArea ####*/
+		.q .imgArea .imgs{width:500px; height:690px; margin:100px 0 0 250px; position:relative;}
+
+		.q .imgs p{position:absolute; animation:translate 2s infinite alternate;}
+		.q .imgs p img{width:100%;}
+		.q .imgs .mob{display:none;}
+		
+		@keyframes translate{
+			0%{transform:translatex(0);}
+			100%{transform:translatex(-5%);}
+		}
+		
+		/*#### textArea ####*/
+		.q .textArea{position:relative; z-index:1;}
+		.q .textArea h3{font-family:"together"; color:#00564d; font-weight:400; text-align:center; font-size:24px; padding-top:100px; line-height:50px; opacity:0%; transition:opacity 0.5s ease-out 0.3s;}
+		.q .textArea h3 em{font-style:normal; font-size:30px;}
+
+		.q .textArea ul{width:54%; padding-top:50px; margin:0 auto;}
+
+		.q .textArea li{width:100%; height:50px;
+			line-height:50px; text-align:center;
+			margin-bottom:15px; float:left;
+			transform:translatex(150%);
+		}
+		.q .textArea li a{display:block; width:100%; height:100%; border:none; border-radius:10px; background-color:#a8c491; font-family:'score400';}
+
+		
+		/*li transition 개별*/
+			.q .textArea li:first-child{transition:transform 0.7s ease-in-out;}
+			.q .textArea li:nth-child(2){transition:transform 0.6s ease-in-out 0.1s;}
+			.q .textArea li:nth-child(3){transition:transform 0.5s ease-in-out 0.2s;}
+			.q .textArea li:nth-child(4){transition:transform 0.4s ease-in-out 0.3s;}
+			.q .textArea li:nth-child(5){transition:transform 0.3s ease-in-out 0.4s;}
+			.q .textArea li:nth-child(6){transition:transform 0.2s ease-in-out 0.5s;}
+
+		/*ul after*/
+		.q .textArea ul:after{content:""; display:block; clear:both;}
+
+		/*기능*/
+		/*.q:hover h3{opacity:100%;}
+		.q:hover .textArea li{transform:translatex(0);}*/
+		.q .textArea li a:hover,.q .textArea li a:focus{background-color:#ffcc32;}
+
+	/*##### 개별작업 #####*/
+		.q2 .textArea h3{padding-top:140px;}
+		.q3 .textArea h3{padding-top:165px;}
+		.q4 .textArea h3{padding-top:190px;}
+
+		.q1 .imgs .bottom{width:100%; left:0; top:46px;}
+		.q1 .imgs .mid1{width:95%; left:18px; top:80px;}
+		.q1 .imgs .mid2{width:87%; left:44px; top:140px;}
+		.q1 .imgs .top{width:97%; left:40px; top:94px;}
+
+		.q2 .imgs .bottom{width:100%; left:0; top:0px;}
+		.q2 .imgs .mid1{width:55%; left:77px; top:50px;}
+		.q2 .imgs .top{width:65%; right:0px; bottom:0px;}
+
+		.q3 .imgs .bottom{width:100%; left:0; bottom:160px;}
+		.q3 .imgs .mid1{width:57%; left:200px; bottom:190px;}
+		.q3 .imgs .mid2{width:100%; left:0px; bottom:150px;}
+		.q3 .imgs .top{width:90%; left:129px; bottom:125px;}
+
+		.q4 .imgs .bottom{width:90%; left:60px; bottom:265px;}
+		.q4 .imgs .mid1{width:30%; left:395px; bottom:220px;}
+		.q4 .imgs .mid2{width:62%; left:145px; bottom:185px;}
+		.q4 .imgs .top{width:30%; left:50px; bottom:164px;}
+
+	/*#### loading ####*/
+		#loading{overflow:hidden;}
+		#loading h3{font-family:"together"; color:#00564d; font-weight:400; font-size:30px; text-align:center; padding:250px 0 50px;}
+		#loading p{width:120px; height:100px; margin:0 auto;}
+		#loading p img{width:100%;}
+
+	/*#### result ####*/
+		section#result{height:84%; overflow-y:scroll; text-align:center;}
+		#result h3{padding-top:100px; padding-bottom:30px;  font-family:"together"; color:#00564d; font-weight:400; font-size:30px; text-transform:uppercase;}
+		#result .rImg{width:250px; height:250px; padding-bottom:50px; margin:0 auto;}
+		#result .rImg img{width:100%;}
+
+		#result .recommend ul{width:480px; margin:0 auto;}
+		#result .recommend li{width:150px; height:100%; margin-left:10px; float:left;}
+		#result .recommend li a{display:block; width:100%; height:100%;}
+		#result .recommend li a img{width:100%;}
+		#result .recommend li a em{font-style:normal; color:#555;}
+		#result .recommend li a .item{color:#00564d; font-size:17px;}
+
+		#result .btn{width:100%; padding:50px 0;}
+		#result .btn a{display:inline-block; padding:20px;  font-weight:700; background-color:#a8c491; border-radius:10px;}
+
+		#result .recommend ul:after{content:"";display:block;clear:both;}
+
+		/*기능*/
+		#result .btn a:hover,#result .btn a:focus{background-color:#ffcc32;}
+
+	/*#### footer ####*/
+		#footer{width:100%; line-height:50px; background-color:#fff; position:fixed; bottom:0; left:0; z-index:7;}
+		#footer .bar{width:95%; height:5px; margin:0 auto; background-color:#ccc; overflow:hidden;}
+		#footer .bar p{width:0%; height:100%; background-color:#00564d; transition:width 0.3s;}
+		#footer h2{width:95%; margin:0 auto; font-family:"together"; font-size:20px; color:#999;}
+
+	/*######## 미디어쿼리 ########*/
+		@media all and (min-width:320px) and (max-width:480px){
+			/*#### header ####*/
+			#header{height:80px;}
+			#header h1{height:50px;}
+			.home_btn{display:none;}
+			
+			/*#### container ####*/
+			#container{margin:80px auto 0;}
+
+			/*#### test_main ####*/
+			#test_main h3{padding-top:200px; font-size:35px; position:relative; z-index:1;}
+			#test_main .text{font-size:16px; position:relative; z-index:1;}
+			
+			/*#### imgs ####*/
+			#test_main .imgs img{width:30%;}
+			#test_main .imgs .img0{left:10%; top:7%;}
+			#test_main .imgs .img1{right:10%; top:18%;}
+			#test_main .imgs .img2{left:9%; bottom:37%;}
+			#test_main .imgs .img3{right:10%; bottom:26%;}
+
+		/*#### q 공통 ####*/
+			.q{position:relative;}
+			.q .imgArea,.q .textArea{width:100%; height:100%; float:none; position:absolute; left:0;top:0;}
+			
+			/*#### imgArea ####*/
+			.q .imgArea .imgs{width:50%; height:300px; margin:0 auto;}
+
+			.q .imgs p{display:none;}
+			.q .imgs .mob{display:block; text-align:center;}
+			.q .imgs .mob img{width:70%;}
+			
+			@keyframes translate{
+				100%{transform:translatey(-2%);}
+			}
+			
+			/*#### textArea ####*/
+			.q .textArea h3{width:80%; padding:0 10%; font-size:24px; padding-top:100px; line-height:30px;}
+			.q .textArea h3 em{font-size:24px;}
+
+			.q .textArea ul{width:90%; padding-top:30px; margin:0 auto;}
+
+			.q .textArea li{width:100%; height:auto;
+				line-height:32px; text-align:center;
+				margin-bottom:14px;
+			}
+			.q .textArea li a{font-size:13px;}
+
+
+		/*##### 개별작업 #####*/
+			.q1 .textArea h3{padding-top:140px;}
+			.q2 .textArea h3{padding-top:140px;}
+			.q3 .textArea h3{padding-top:165px;}
+			.q4 .textArea h3{padding-top:185px;}
+
+			.q1 .imgs .mob img{padding-top:20px;}
+			.q2 .imgs .mob img{padding-top:20px;}
+			.q3 .imgs .mob img{padding-top:50px;}
+			.q4 .imgs .mob img{padding-top:40px;}
+
+		/*#### loading ####*/
+			#loading h3{font-size:30px; padding:150px 0 100px; line-height:40px;}
+			#loading .br{display:inline-block;}
+			#loading p{width:60px;}
+
+		/*#### result ####*/
+			#result h3{font-size:24px;}
+			#result h3:first-child{font-size:28px; line-height:40px;}
+			#result .rImg{width:150px; height:150px; padding-bottom:50px;}
+			#result .text{width:80%; margin:0 auto;}
+			#result .br{display:inline-block;}
+
+			#result .recommend ul{width:100%; height:200px; margin:0; text-align:center;}
+			#result .recommend li{width:95px; height:100%; margin-left:0px; float:none; font-size:12px; display:none; vertical-align:top;}
+			#result .recommend .oh{display:inline-block;}
+			#result .recommend li a .item{font-size:14px;}
+
+		/*#### footer ####*/
+			#footer h2{font-size:14px;}
+		}
+  </style>
+ </head>
+
+ <body>
+	<div id="wrap">		
+		<header id="header">
+			<h1>
+				<a href="../index.php" title="치즈퀸_메인페이지"><img src="../img/basic/logo.png" alt="치즈퀸"/></a>
+			</h1>
+		</header>
+		<div class="home_btn">
+			<a href="test.html" title="다시하기">다시하기</a>
+		</div>
+		<div id="container">
+			<div id="testArea">				
+				<section id="test_main">
+					<h2>테스트 메인페이지</h2>
+					<h3><span class="color">치즈</span> MBTI 테스트</h3>
+					<p class="text">
+						세상은 넓고 치즈는 많다!<br/>
+						내 취향을 나도 잘 모르겠다면?
+					</p>					
+					<p class="imgs">
+						<img class="img0" src="../img/sub/test/main_top0.png" alt="메인_오브젝트이미지0"/>
+						<img class="img1" src="../img/sub/test/main_top1.png" alt="메인_오브젝트이미지1"/>
+						<img class="img2" src="../img/sub/test/main_top2.png" alt="메인_오브젝트이미지2"/>
+						<img class="img3" src="../img/sub/test/main_top3.png" alt="메인_오브젝트이미지3"/>
+					</p>
+					<p class="btn">
+						<a href="#none" title="태스트시작">테스트 시작!</a>
+					</p>
+				</section>
+				<section class="q q1">
+					<h2>문제1번</h2>
+					<div class="imgArea">
+						<div class="imgs">
+							<p class="bottom">
+								<img src="../img/sub/test/q1_bottom.png" alt="q1_오브젝트이미지0"/>
+							</p>
+							<p class="mid1">
+								<img src="../img/sub/test/q1_mid1.png" alt="q1_오브젝트이미지1"/>
+							</p>
+							<p class="mid2">
+								<img src="../img/sub/test/q1_mid2.png" alt="q1_오브젝트이미지2"/>
+							</p>
+							<p class="top">
+								<img src="../img/sub/test/q1_top.png" alt="q1_오브젝트이미지3"/>
+							</p>
+							<p class="mob">
+								<img src="../img/sub/test/q1_m.png" alt="q1_오브젝트이미지모바일"/>
+							</p>
+						</div>
+					</div>
+					<div class="textArea">
+						<h3>
+							01.<br/>
+							<em><span class="color">치즈가 들어간 음식</span> 중 가장 좋아하는 것은?</em>
+						</h3>
+						<ul>
+							<li><a href="#none" title="치즈샌드위치" onclick="testQ('o');">간단한 <strong>치즈 샌드위치</strong></a></li>
+							<li><a href="#none" title="퐁듀" onclick="testQ('m');">따뜻한 <strong>퐁듀</strong></a></li>
+							<li><a href="#none" title="샐러드" onclick="testQ('o');">건강한 <strong>샐러드</strong></a></li>
+							<li><a href="#none" title="피자" onclick="testQ('m');">쭉쭉 늘어나는<strong>피자</strong></a></li>
+							<li><a href="#none" title="치즈케이크" onclick="testQ('m');">꾸덕꾸덕 달콤한 <strong>치즈케이크</strong></a></li>
+							<li><a href="#none" title="치즈플래터" onclick="testQ('o');">치즈 본연의 맛! <strong>치즈플래터</strong></a></li>
+						</ul>
+					</div>				
+				</section>
+				<section class="q q2">
+					<h2>문제2번</h2>
+					<div class="imgArea">
+						<div class="imgs">
+							<p class="bottom">
+								<img src="../img/sub/test/q2_bottom.png" alt="q2_오브젝트이미지0"/>
+							</p>
+							<p class="mid1">
+								<img src="../img/sub/test/q2_mid.png" alt="q2_오브젝트이미지1"/>
+							</p>
+							<p class="top">
+								<img src="../img/sub/test/q2_top.png" alt="q1_오브젝트이미지2"/>
+							</p>
+							<p class="mob">
+								<img src="../img/sub/test/q2_m.png" alt="q2_오브젝트이미지모바일"/>
+							</p>
+						</div>
+					</div>
+					<div class="textArea">
+						<h3>
+							02.<br/>
+							<em>치즈에 곁들일 <span class="color">음료</span>를 하나 고른다면?</em>
+						</h3>
+						<ul>
+							<li><a href="#none" title="커피" onclick="testQ('s');"><strong>커피</strong></a></li>
+							<li><a href="#none" title="와인" onclick="testQ('h');"><strong>와인</strong></a></li>
+							<li><a href="#none" title="맥주" onclick="testQ('h');"><strong>맥주</strong></a></li>
+							<li><a href="#none" title="차" onclick="testQ('s');"><strong>차</strong></a></li>
+							<li><a href="#none" title="과일주스" onclick="testQ('s');"><strong>과일주스</strong></a></li>
+						</ul>
+					</div>				
+				</section>
+				<section class="q q3">
+					<h2>문제3번</h2>
+					<div class="imgArea">
+						<div class="imgs">
+							<p class="bottom">
+								<img src="../img/sub/test/q3_bottom.png" alt="q3_오브젝트이미지0"/>
+							</p>
+							<p class="mid1">
+								<img src="../img/sub/test/q3_mid1.png" alt="q13_오브젝트이미지1"/>
+							</p>
+							<p class="mid2">
+								<img src="../img/sub/test/q3_mid2.png" alt="q3_오브젝트이미지2"/>
+							</p>
+							<p class="top">
+								<img src="../img/sub/test/q3_top.png" alt="q3_오브젝트이미지3"/>
+							</p>
+							<p class="mob">
+								<img src="../img/sub/test/q3_m.png" alt="q3_오브젝트이미지모바일"/>
+							</p>
+						</div>
+					</div>
+					<div class="textArea">
+						<h3>
+							03.<br/>
+							<em><span class="color">주말 아침</span> 첫 끼니, 당신의 선택은?</em>
+						</h3>
+						<ul>
+							<li><a href="#none" title="리코타 치즈 샐러드" onclick="testQ('c');">담백한 <strong>리코타 치즈 샐러드</strong></a></li>
+							<li><a href="#none" title="리얼 파마산 치즈" onclick="testQ('w');"><strong>리얼 파마산 치즈</strong>를 갈아넣은 파스타</a></li>
+							<li><a href="#none" title="에멘탈치즈" onclick="testQ('w');"><strong>에멘탈치즈</strong>를 잘라 녹인 샌드위치</a></li>
+							<li><a href="#none" title="부라타치즈" onclick="testQ('c');">토마토에 <strong>부라타치즈</strong> 한 알 톡. 카프레제</a></li>
+						</ul>
+					</div>				
+				</section>
+				<section class="q q4">
+					<h2>문제4번</h2>
+					<div class="imgArea">
+						<div class="imgs">
+							<p class="bottom">
+								<img src="../img/sub/test/q4_bottom.png" alt="q4_오브젝트이미지0"/>
+							</p>
+							<p class="mid1">
+								<img src="../img/sub/test/q4_mid1.png" alt="q4_오브젝트이미지1"/>
+							</p>
+							<p class="mid2">
+								<img src="../img/sub/test/q4_mid2.png" alt="q4_오브젝트이미지2"/>
+							</p>
+							<p class="top">
+								<img src="../img/sub/test/q4_top.png" alt="q4_오브젝트이미지3"/>
+							</p>
+							<p class="mob">
+								<img src="../img/sub/test/q4_m.png" alt="q4_오브젝트이미지모바일"/>
+							</p>
+						</div>
+					</div>
+					<div class="textArea">
+						<h3>
+							04.<br/>
+							<em>당신의 <span class="color">치즈 경험도</span>는 어느정도?</em>
+						</h3>
+						<ul>
+							<li><a href="#none" title="치즈 초심자" onclick="testQ('n');">치즈는 사진 찍을 때에만 해봤어요 <strong>치즈 초심자</strong></a></li>
+							<li><a href="#none" title="치즈 탐험가" onclick="testQ('n');">다양한 치즈가 궁금해요 <strong>치즈 탐험가</strong></a></li>
+							<li><a href="#none" title="치즈 고인물" onclick="testQ('b');">나는야 블루치즈 마니아! <strong>치즈 고인물</strong></a></li>
+						</ul>
+					</div>				
+				</section>
+				<section id="loading">
+					<h2>결과로딩화면</h2>
+					<h3><span class="br">나의 <span class="color">치즈 MBTI </span></span><span class="br">분석중...</span></h3>
+					<p>
+						<img src="../img/sub/test/cheese_loading.gif" alt="테스트로딩"/>
+					</p>
+				</section>
+				<section id="result">
+					<h2>결과</h2>
+					<div class="desc">
+						<h3><span class="br">당신의 치즈 MBTI는 </span><span class="br"><span id="mbti" class="color">0000</span>입니다.</span></h3>
+						<p class="rImg">
+							<img src="../img/item/cheese/natural/0801_0.jpg" alt="결과이미지"/>
+						</p>
+						<p class="text">
+							<span id="sh">단단한</span> 식감의 <span id="nb">무난한 </span><span id="om">안주용</span> 치즈를 찾으시는군요!<br/>
+							<span id="rDesc">구멍이 송송 난 에멘탈 치즈나 콜비잭치즈를 잘라<br/>
+							나만의 치즈 플래터를 구성해보세요.</span>
+						</p>
+					</div>
+					<div class="recommend">
+						<h3>치즈퀸 <span class="color">추천상품</span></h3>
+						<ul>
+							<li class="oh">
+								<a href="item.html" title="추천상품0">
+									<span><img src="../img/item/cheese/natural/0802_0.jpg" alt="플래터하드치즈0"/></span>
+									<em>
+										<b class="item">페이장 브레통 에멘탈 프랑시스 250g</b><br/>
+										8,000원
+									</em>
+								</a>
+							</li>
+							<li class="oh">
+								<a href="item.html" title="추천상품1">
+									<span><img src="../img/item/cheese/natural/0803_0.jpg" alt="플래터하드치즈1"/></span>
+									<em>
+										<b class="item">에미 에멘탈러 200g</b><br/>
+										11,700원
+									</em>
+								</a>
+							</li>
+							<li class="oh">
+								<a href="item.html" title="추천상품2">
+									<span><img src="../img/item/cheese/natural/0804_0.jpg" alt="플래터하드치즈2"/></span>
+									<em>
+										<b class="item">엠보그 에멘탈러 200g</b><br/>
+										6,330원
+									</em>
+								</a>
+							</li>
+							<li class="os">
+								<a href="item.html" title="추천상품2">
+									<span><img src="../img/item/cheese/natural/0000_0.jpg" alt="플래터소프트치즈0"/></span>
+									<em>
+										<b class="item">프란시아 리코타 250g</b><br/>
+										6,400원
+									</em>
+								</a>
+							</li>
+							<li class="os">
+								<a href="item.html" title="추천상품2">
+									<span><img src="../img/item/cheese/moz/000_0.jpg" alt="플래터소프트치즈1"/></span>
+									<em>
+										<b class="item">브렐렛 후레쉬 모짜렐라 125g</b><br/>
+										5,200원
+									</em>
+								</a>
+							</li>
+							<li class="os">
+								<a href="item.html" title="추천상품2">
+									<span><img src="../img/item/cheese/moz/003_0.jpg" alt="플래터소프트치즈2"/></span>
+									<em>
+										<b class="item">무르젤라 이탈리안 부라타 치즈 120g</b><br/>
+										7,400원
+									</em>
+								</a>
+							</li>
+							<li class="bl">
+								<a href="item.html" title="추천상품">
+									<span><img src="../img/item/cheese/natural/0500_0.jpg" alt="블루치즈0"/></span>
+									<em>
+										<b class="item">브레스 블루 140g</b><br/>
+										11,080원
+									</em>
+								</a>
+							</li>
+							<li class="bl">
+								<a href="item.html" title="추천상품">
+									<span><img src="../img/item/cheese/natural/0501_0.jpg" alt="블루치즈1"/></span>
+									<em>
+										<b class="item">프로마제 다피누아 블루 170g</b><br/>
+										12,200원
+									</em>
+								</a>
+							</li>
+							<li class="bl">
+								<a href="item.html" title="추천상품">
+									<span><img src="../img/item/cheese/natural/0504_0.jpg" alt="블루치즈2"/></span>
+									<em>
+										<b class="item">생 아구르 크림 150g</b><br/>
+										9,380원
+									</em>
+								</a>
+							</li>
+							<li class="mi">
+								<a href="item.html" title="추천상품">
+									<span><img src="../img/item/cheese/natural/0600_0.jpg" alt="요리치즈0"/></span>
+									<em>
+										<b class="item">메사나 파마산 치즈가루 227g</b><br/>
+										7,200원
+									</em>
+								</a>
+							</li>
+							<li class="mi">
+								<a href="item.html" title="추천상품">
+									<span><img src="../img/item/cheese/natural/0602_0.jpg" alt="요리치즈1"/></span>
+									<em>
+										<b class="item">만토바 파르미지아노 레지아노 200g</b><br/>
+										11,000원
+									</em>
+								</a>
+							</li>
+							<li class="mi">
+								<a href="item.html" title="추천상품">
+									<span><img src="../img/item/cheese/natural/0606_0.jpg" alt="요리치즈2"/></span>
+									<em>
+										<b class="item">만토바 그라나파다노 1kg</b><br/>
+										27,200원
+									</em>
+								</a>
+							</li>
+						</ul>
+					</div>
+					<!--<div class="sns">
+						<h3>친구에게 결과 <span class="color">공유하기</span></h3>
+						<p class="imgLink">
+							<a href="#" title="링크복사">
+								<img src="../img/sub/test/icon_link.svg" alt="링크복사"/>
+							</a>
+							<a href="#" title="페이스북공유">
+								<img src="../img/sub/test/icon_facebook.svg" alt="페이스북공유"/>
+							</a>
+							<a href="#" title="트위터공유">
+								<img src="../img/sub/test/icon_twitter.svg" alt="트위터공유"/>
+							</a>
+							<a href="#" title="카카오공유">
+								<img src="../img/sub/test/icon_kakao.svg" alt="카카오공유"/>
+							</a>
+						</p>
+					</div>-->
+					<p class="btn">
+						<a href="test.html" title="테스트다시하기">테스트 다시하기</a>
+					</p>
+				</section>
+			</div>
+		</div>
+		<footer id="footer">
+			<div class="bar">
+				<p></p>
+			</div>
+			<h2>&copy; es.c.ape1001</h2>
+		</footer>
+	</div>
+ </body>
+</html>
